@@ -42,7 +42,8 @@ initial begin
     s_val = 0;
     clock = 1;
     reset = 1;
-    s_data = 8'b00000000; 
+    s_data = 8'b00000000;
+    //assert (m_rdy == 0 &&  s_val == 0); 
       repeat(1) #1 clock = ~clock;
       $display("Reset all");
       
@@ -51,6 +52,7 @@ initial begin
     m_rdy=1;
     s_val = 1;
     s_data = 8'b00010000;
+    //assert (m_rdy == 1 &&  s_val == 1); 
       repeat(8) #1  clock = ~clock;  
     
     clock = 1;
@@ -58,6 +60,7 @@ initial begin
     m_rdy=1;
     s_val = 1;
     s_data =  8'b00000001;
+    //assert (m_rdy == 1 &&  s_val == 1); 
       repeat(8) #1 clock = ~clock;
   clock = ~clock;
    
@@ -67,6 +70,7 @@ initial begin
     m_rdy=1;
     s_val = 1;
     s_data =  8'b00000010;
+    //assert (m_rdy == 1 &&  s_val == 1); 
     repeat(8) #1 clock = ~clock;
       
     clock = 1;
@@ -74,9 +78,10 @@ initial begin
     m_rdy=1;
     s_val = 1;
     s_data =  8'b00000100;
+    //assert (m_rdy == 1 &&  s_val == 1); 
     repeat(8) #1 clock = ~clock;
    
-    $finish;
+    #80 $finish;
   end
 
 endmodule

@@ -28,7 +28,7 @@ always @(posedge clock or posedge reset)
 	    end 
 		else 
 		begin
-		    if (s_rdy == 1'b1 && s_val == 1'b1) 
+		    if ((m_rdy == 1'b1) && (s_val == 1'b1))
 			begin
 			  	counter <= counter + 1'b1;
 				case(counter)
@@ -43,7 +43,7 @@ always @(posedge clock or posedge reset)
 		if (counter == 2'b11) 
 		begin
 		    m_val <= 1;
-		    m_rdy <= 1;
+		    s_rdy <= 1;		       	
 		end
 		    else begin
 		        m_val <=0;

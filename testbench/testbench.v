@@ -10,7 +10,7 @@ reg clk
 ,	signal_load
 ,	signal_init
 ,	signal_neg
-,   signal_oe; 
+, signal_oe; 
 
 reg [DATA_WIDTH-1:0] data_in = 5;
 reg [ATTR_WIDTH-1:0] attr_in = 0;
@@ -25,15 +25,15 @@ bench testbench (
         .data_in(data_in),
         .attr_in(attr_in)        
 );
-always
-  #10 clk = ~clk;
-event load;
-/////////////////////////
-/////////////////////////
-/////////////////////////
-/////////////////////////
-/////////////////////////
 
+//event load;
+event reset_trigger; 
+event reset_done_trigger;
+/////////////////////////
+/////////////////////////
+/////////////////////////
+/////////////////////////
+/////////////////////////
 task defaultValue;
 	begin
 		$display(" START default ");		
@@ -45,65 +45,88 @@ task defaultValue;
 	end
 endtask 
 
-task Pull_value;
-	input number_of_operation;
-	input signal_load;
-	input signal_init;
-	input signal_neg;
-	input signal_oe;
-	input data_in;
-	begin
-		//@(posedge clk);
-		$display("Operation Number = %d  Time: ", number_of_operation, $time);
-	end
+initial begin 
+ forever begin 
+  @ (reset_trigger); 
+  @ (negedge clk); 
+  signal_load = 0;   
+  //@ (negedge clock); 
+  //signal_load = 1; 
+  -> reset_done_trigger; 
+  end 
+end
+
+task init;
+begin
+  signal_init = 1;
+  @ (posedge clk);
+  signal_init = !signal_init;
+end
 endtask
 
-task write_data;
-	input [31:0] data;
-	begin
-		$display(" Start write_data! Time: ", $time);
-		@(posedge signal_load);
-		/////////////////////////////////////////////
-		@(posedge clk);
-		Pull_value (1,,1,,,data_one);
-		@(posedge clk);
-		Pull_value (2,0,0,1,,data_one);
-		@(posedge clk);
-		Pull_value (3,1,1,,,);
-		@(posedge clk);
-		Pull_value (4,0,0,,,data_two);
-		@(posedge clk);
-		Pull_value (5,0,0,,,data_two);
-		@(posedge clk);
-		Pull_value (6,,1,,,);
-		@(posedge clk);
-		Pull_value (7,,0,,,);
-		@(posedge clk);
-		Pull_value (8,0,,,,);
-		@(posedge clk);
-		Pull_value (9,1,0,,,);
-		/////////////////////////////////////////////		
-		-> load;
-	end
+task send;
+  input [DATA_WIDTH-1:0] data;//, del;
+begin
+   @(posedge clk);
+  signal_load = 1;
+  
+  //repeat (del) begin @(posedge clk); end
+  data_in = data;
+  repeat(2) begin @(posedge clk); end
+  signal_neg = 0;
+  -> reset_trigger;
+end
 endtask
 
+task neg;
+    begin
+        signal_neg = 1;
+    end
+endtask
+
+task oe;
+    begin
+        signal_oe = 1;
+        -> reset_trigger;
+    end
+endtask
 // Событие загрузки 
-always begin
-	@(load);
-	$display(" LOAD! ");
-	signal_load = 1;
+// always begin
+// 	@(load);
+// 	$display(" LOAD! ");
+// 	signal_load = 1;
+// end
+initial begin
+  clk = 0;
+  forever #5 clk = !clk;
 end
 
 initial 
   begin
-    $display("start");
-    clk = 0; 
-	defaultValue ();
-	#20	
-	-> load;
-	write_data(3);	
+
+    $display("Start programm");
+    //clk = 0;
+
+    defaultValue();
+
+    init(); 
+    send(4); send(3); neg(); send(5);
+    oe();
+
+    init();
+    send(2); send(3); send(2);
+    oe();
 
   end
+// initial 
+//   begin
+//     $display("start");
+//     clk = 0; 
+// 	defaultValue ();
+// 	sumTwoValue (1,2,3,4);
+//   //write_data(3);	
+
+//   end
 /////////////////////////////
 /////////////////////////////
 /////////////////////////////
