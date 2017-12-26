@@ -116,7 +116,8 @@ initial
 //    Load_Data(START);                @(posedge clk);
     RST <= 0;
     Initialization (25);       @(posedge clk);
-    nop(); @(posedge clk);
+    //nop(); @(posedge clk);
+    //nop(); @(posedge clk);
     Load_Data(25);                 @(posedge clk);
     // Initialization (STOP);           @(posedge clk);
     // Send_Value(3);         repeat(2) @(posedge clk);
