@@ -1,0 +1,14 @@
+.DS_Store
+/.stack-work
+*.refactored.hs
+/dist
+/resource/data.json
+*.vcd
+a.out
+*.signals.v
+*.inputs.v
+*.outputs.v
+*.tix
+*.prof
+hdl/gen/*
+.vscode/*

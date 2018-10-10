@@ -2,26 +2,23 @@ module tapController
 (
     // input Jtag interface pins
 
-	input   TMS,
-	input   TCK,
-	input   TRST,
+	input   TMS
+,	input   TCK
+,	input   TRST
     // output Jtag interface pins
-    output  reg ENABLE
+,   output reg ENABLE
     // output from STATE
 ,   output reg TLR
 ,   output reg RTI
 ,   output reg UPDATE_IR
 ,   output reg UPDATE_DR
-,   output reg CLOCK_DR
-,   output reg CLOCK_IR
+,   output reg CAPTURE_DR
+,   output reg CAPTURE_IR
 ,   output reg SHIFT_IR
 ,   output reg SHIFT_DR
-,	output reg SELECT
-,	output reg TCK_inv
-
+,	output 	   MOD
 );
 
-assign TCK_inv = ~TCK;
 // State assignments for example TAP controller
 localparam STATE_TEST_LOGIC_RESET = 4'hF;
 localparam STATE_RUN_TEST_IDLE    = 4'hC;
@@ -129,29 +126,36 @@ end
 always @ (State)
 begin
 	// Default everything to 0, keeps the case statement simple
-	TLR = 1'b0;
-	RTI = 1'b0;
-	SHIFT_DR = 1'b0;	
-	UPDATE_DR = 1'b0;	
-	SHIFT_IR = 1'b0;	
-	UPDATE_IR = 1'b0;
+	TLR <= 1'b0;
+	RTI <= 1'b0;
+	SHIFT_DR <= 1'b0;	
+	UPDATE_DR <= 1'b0;
+	CAPTURE_DR <= 1'b0;	
+	SHIFT_IR <= 1'b0;	
+	UPDATE_IR <= 1'b0;	
+	CAPTURE_IR <= 1'b0;
 
 	case (State)
-		STATE_TEST_LOGIC_RESET: TLR = 1'b1;
-		STATE_RUN_TEST_IDLE:    RTI = 1'b1;		
-		STATE_SHIFT_DR:         SHIFT_DR = 1'b1;		
-		STATE_UPDATE_DR:        UPDATE_DR = 1'b1;		
-		STATE_SHIFT_IR:         SHIFT_IR = 1'b1;		
-		STATE_UPDATE_IR:        UPDATE_IR = 1'b1;
-		default: ;
+		STATE_TEST_LOGIC_RESET: TLR <= 1'b1;
+		STATE_RUN_TEST_IDLE:    RTI <= 1'b1;		
+		STATE_SHIFT_DR:         SHIFT_DR <= 1'b1;		
+		STATE_UPDATE_DR:        UPDATE_DR <= 1'b1;		
+		STATE_SHIFT_IR:         SHIFT_IR <= 1'b1;		
+		STATE_UPDATE_IR:        UPDATE_IR <= 1'b1;
+		STATE_CAPTURE_IR:		CAPTURE_IR <= 1'b1;
+		STATE_CAPTURE_IR:		CAPTURE_DR <= 1'b1;
 	endcase
 end
+always @ (posedge TCK)
+begin
+  ENABLE <= SHIFT_IR | SHIFT_DR;
+end
+
+assign MOD = state == STATE_CAPTURE_IR
+                | state == STATE_SHIFT_IR
+                | state == STATE_EXIT1_IR
+                | state == STATE_PAUSE_IR
+                | state == STATE_EXIT2_IR
+                | state == STATE_UPDATE_IR;
 
 endmodule
-
-/*
-reg shift_reg [param - 1];
-reg LSB [1:0];
-reg BSR [param - 1];
-reg shift_reg <= {BSR:LSB}
-*/

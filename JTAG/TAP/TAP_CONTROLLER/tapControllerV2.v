@@ -3,26 +3,26 @@
 // Top module
 module tap_top(
                 // JTAG pads
-                tms_pad_i, 
-                tck_pad_i, 
-                trstn_pad_i, 
-                tdi_pad_i, 
-                tdo_pad_o, 
-                tdo_padoe_o,
+                tms_pad_i, // TMS
+                tck_pad_i, // TCK
+                trstn_pad_i, // TRST
+                tdi_pad_i, // TDI
+                tdo_pad_o, // TDO
+                tdo_padoe_o, // ENABLE
 
                 // TAP states
-				test_logic_reset_o,
-				run_test_idle_o,
-                shift_dr_o,
-                pause_dr_o, 
-                update_dr_o,
-                capture_dr_o,
+				test_logic_reset_o, // TLR
+				run_test_idle_o, // RTI
+                shift_dr_o, // SHIFT_DR
+                pause_dr_o,  // 
+                update_dr_o, // UPDATE_DR
+                capture_dr_o, // CAPTURE_DR
                 
                 // Select signals for boundary scan or mbist
-                extest_select_o, 
-                sample_preload_select_o,
-                mbist_select_o,
-                debug_select_o,
+                extest_select_o, // EXTEST
+                sample_preload_select_o, // SAMPLE_PRELOAD
+                mbist_select_o, // MBIST
+                debug_select_o, // DEBUG
                 
                 // TDO signal that is connected to TDI of sub-modules.
                 tdi_o, 
@@ -459,3 +459,7 @@ end
 **********************************************************************************/
 
 endmodule
+
+// git@github.com:lgeek/adv_debug_sys.git
+
+// git@github.com:vfonov/opendous-jtag.git
