@@ -1,21 +1,23 @@
 `timescale 1 ns / 1 ns
-module testbenchTap ();
+module tar_controller_tb();
 
 reg TMS;
 reg TCK;
 reg TRST;
 
-tapController tapController_test
+tar_controller tar_controller_sample
 ( 
-  .TMS(TMS), .TCK(TCK), .TRST(TRST)
+  .TMS(TMS)
+, .TCK(TCK)
+, .TRST(TRST)
 );
 
 always begin
-   #5  TCK <= ~TCK;
+   #5  TCK <= ~TCK; // 200MHz
 end
 
 initial begin
-   TCK <= 0; TMS = 0;  @(posedge TCK);
+   TCK <= 0; TMS = 0; @(posedge TCK);
    TRST <= 1;          @(posedge TCK);
    TRST <= 0;          @(posedge TCK);
 end

@@ -50,7 +50,7 @@ always @(LATCH_IR) begin
         `IDCODE:   begin IDCODE_SELECT   <= 1'b1; end
         `USERCODE: begin USERCODE_SELECT <= 1'b1; end
         `HIGHZ:    begin HIGHZ_SELECT    <= 1'b1; end
-        default:  begin BYPASS_SELECT   <= 1'b1; end
+        default:  begin BYPASS_SELECT    <= 1'b1; end
     endcase
 end
 
