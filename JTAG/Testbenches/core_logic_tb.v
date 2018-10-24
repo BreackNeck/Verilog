@@ -6,9 +6,9 @@ module core_logic_tb
 
 reg clk, rst;
 
-core_logic #(
+CORE_LOGIC #(
    .DEFAULT( DEFAULT ) 
-) core_logic_sample
+) CORE_LOGIC_INST
 ( .clk(clk)
 , .rst(rst)
 );

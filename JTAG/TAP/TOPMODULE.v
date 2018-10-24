@@ -66,7 +66,7 @@ tapController tapController_inst
 );
 
 ir ir_inst 
-(.IR_DATA_WIDTH(IR_DATA_WIDTH))
+#(.IR_DATA_WIDTH(IR_DATA_WIDTH))
 (
   .TDI(TDI)
 , .TCK(TCK)
@@ -80,7 +80,7 @@ ir ir_inst
 );
 
 dr dr_inst
-(.ID_WIDTH(ID_WIDTH)
+#(.ID_WIDTH(ID_WIDTH)
 , .USER_WIDTH(USER_WIDTH)
 , .ID_VALUE(ID_VALUE)
 , .USER_VALUE(USER_VALUE)

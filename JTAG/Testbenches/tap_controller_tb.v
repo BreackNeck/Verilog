@@ -1,5 +1,5 @@
 `timescale 1 ns / 1 ns
-module tar_controller_tb();
+module tap_controller_tb();
 
 reg TMS;
 reg TCK;
@@ -33,8 +33,8 @@ initial begin
 end
 
 initial begin
-  $dumpfile("tar_controller_tb.vcd");
-  $dumpvars(-1, tar_controller_tb);
+  $dumpfile("tap_controller_tb.vcd");
+  $dumpvars(-1, tap_controller_tb);
 end
 
 endmodule
