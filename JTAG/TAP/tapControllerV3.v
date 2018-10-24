@@ -9,13 +9,13 @@ module tapController
 ,   output reg ENABLE
     // output from STATE
 ,   output reg TLR
-,   output reg RTI
 ,   output reg UPDATE_IR
 ,   output reg UPDATE_DR
 ,   output reg CAPTURE_DR
 ,   output reg CAPTURE_IR
 ,   output reg SHIFT_IR
 ,   output reg SHIFT_DR
+,   output     EXIT1_DR
 ,	output 	   MOD
 );
 
@@ -146,6 +146,9 @@ begin
 		STATE_CAPTURE_IR:		CAPTURE_DR <= 1'b1;
 	endcase
 end
+
+assign EXIT1_DR  = state == STATE_EXIT1_DR;
+
 always @ (posedge TCK)
 begin
   ENABLE <= SHIFT_IR | SHIFT_DR;

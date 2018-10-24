@@ -6,4 +6,4 @@
 `define CLAMP    = 4'h5; 
 `define IDCODE   = 4'h7; 
 `define USERCODE = 4'h8; 
-`define HIGHZ    = 4'h9; 
+`define HIGHZ    = 4'h9;

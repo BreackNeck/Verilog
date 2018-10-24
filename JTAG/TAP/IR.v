@@ -3,15 +3,15 @@ module IR
 	parameter IR_DATA_WIDTH = 4  // IR_LENGTH PARAMETR
 )
 (
-    input                        TRST
-,   input                        TDI
-,   input                        TCK
-,   input                        UPDATE_IR
-,   input                        SHIFT_IR
-,   input                        CAPTURE_IR
-,   input                        TLR
-,   output reg [IR_DATA_WIDTH:0] LATCH_IR
-,   output reg                   I_TDO
+    input                          TRST
+,   input                          TDI
+,   input                          TCK
+,   input                          UPDATE_IR
+,   input                          SHIFT_IR
+,   input                          CAPTURE_IR
+,   input                          TLR
+,   output reg [IR_DATA_WIDTH-1:0] LATCH_IR
+,   output reg                     I_TDO
 );
 
 
@@ -45,3 +45,4 @@ begin
     LATCHED_IR <= IR;
 end
 
+endmodule

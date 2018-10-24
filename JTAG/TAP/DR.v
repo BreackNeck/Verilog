@@ -6,9 +6,11 @@ module dr
     , USER_WIDTH = 8
     , ID_VALUE = 8'hA1
     , USER_VALUE = 8'hA1
+    , BSR_WIDTH = 10
 )
 (
     input            TRST
+,   input            TLR
 ,   input            TCK
 ,   input            TDI
 ,   input            ENABLE
@@ -16,11 +18,15 @@ module dr
 ,   input            CAPTURE_DR
 ,   input            UPDATE_DR
 ,   input            SHIFT_DR
+,   input            EXTERNAL_inREG
+,   input            CORE_LOGIC
 
-,   output reg [7:0] BSR
+,   output reg       [BSR_WIDTH-1:0] BSR
 ,   output reg       BSR_TDO
 ,   output reg       ID_TDO
 ,   output reg       USER_TDO
+,   output [3:0]     EXTERNAL_outREG
+,   output [3:0]     CORE_LOGIC_OUT
 );
 
 reg [ID_WIDTH-1:0]   ID <= ID_VALUE;
@@ -58,25 +64,39 @@ always @ (posedge TCK or negedge TRST)
 begin
   if(TRST == 0) 
     begin
-    ID <= ID_VALUE;
-    USER <= USER_VALUE; 
+      ID <= ID_VALUE;
+      USER <= USER_VALUE; 
     end  
   else if (TLR)
     begin
-    ID <= ID_VALUE;
-    USER <= USER_VALUE;
+      ID <= ID_VALUE;
+      USER <= USER_VALUE;
     end
   else if (IDCODE_SELECT & CAPTURE_DR)
-    ID <=  ID_VALUE;
+      ID <=  ID_VALUE;
   else if (USERCODE_SELECT & CAPTURE_DR)
-    USER <= USER_VALUE;
+      USER <= USER_VALUE;
   else if (IDCODE_SELECT & SHIFT_DR)
-    ID <= {TDI, ID[ID_WIDTH-1:1]};
+      ID <= {TDI, ID[ID_WIDTH-1:1]};
   else if (USERCODE_SELECT & SHIFT_DR)
-    USER <= {TDI, USER[USER_WIDTH-1:1]};
-  else if (EXTEST_SELECT & SHIFT_DR)
-    BSR <= {TDI, BSR[7:1];}
+      USER <= {TDI, USER[USER_WIDTH-1:1]};
 end
+
+always @ (posedge TCK) 
+begin
+    if ( SAMPLE_SELECT & CAPTURE_DR) 
+        BSR <= { EXTERNAL_inREG[3:0], LSB };
+    else if ( EXTEST_SELECT & CAPTURE_DR) 
+        BSR <= { EXTERNAL_inREG[3:0], BSR[3:0], LSB };
+    else if ( INTEST_SELECT & CAPTURE_DR) 
+        BSR <= { CORE_LOGIC[3:0], LSB };
+    else if ( SHIFTDR & (SAMPLE_SELECT | EXTEST_SELECT | INTEST_SELECT))
+        BSR <= { TDI, BSR[BSR_WIDTH-1:1] };
+   
+end
+
+assign EXTERNAL_outREG = BSR[9:6];
+assign CORE_LOGIC_OUT  = BSR[5:2];
 
 always @ (negedge TCK) ID_TDO <= ID[0];
 always @ (negedge TCK) USER_TDO <= USER[0];
