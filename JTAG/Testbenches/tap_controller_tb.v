@@ -5,7 +5,7 @@ reg TMS;
 reg TCK;
 reg TRST;
 
-tar_controller tar_controller_sample
+tapController tapController_sample
 ( 
   .TMS(TMS)
 , .TCK(TCK)

@@ -1,4 +1,4 @@
-`include "IR_DEFINES.v"
+//`include "IR_DEFINES.v"
 
 module TOPMODULE
 
@@ -11,10 +11,11 @@ module TOPMODULE
 );
 
 reg  [3:0] EXTERNAL_inREG;
-reg  [3:0] CORE_LOGIC;
+reg  [3:0] IO_IO_CORE_LOGIC;
+reg  [3:0] IO_CORE;
 
 wire [3:0] EXTERNAL_outREG;
-wire [3:0] CORE_LOGIC_OUT;
+wire [3:0] IO_CORE_LOGIC_OUT;
 
 wire       CAPTURE_IR;
 wire       SHIFT_IR;
@@ -32,6 +33,8 @@ wire       TRST;
 
 wire [3:0] IR;
 
+wire       EXIT1DR;
+
 wire       ID_TDO;
 wire       USER_TDO;
 wire       I_TDO;    
@@ -47,6 +50,16 @@ wire CLAMP_SELECT;
 wire IDCODE_SELECT;
 wire USERCODE_SELECT;
 wire HIGHZ_SELECT;
+
+localparam BYPASS   = 4'hF;
+localparam SAMPLE   = 4'h1; 
+localparam EXTEST   = 4'h2; 
+localparam INTEST   = 4'h3; 
+localparam RUNBIST  = 4'h4; 
+localparam CLAMP    = 4'h5; 
+localparam IDCODE   = 4'h7; 
+localparam USERCODE = 4'h8; 
+localparam HIGHZ    = 4'h9;
 
 tapController tapController_inst
 ( 
@@ -65,8 +78,7 @@ tapController tapController_inst
 , .CAPTURE_DR(CAPTURE_DR)
 );
 
-ir ir_inst 
-#(.IR_DATA_WIDTH(IR_DATA_WIDTH))
+IR #(.IR_DATA_WIDTH(4)) IR_inst 
 (
   .TDI(TDI)
 , .TCK(TCK)
@@ -79,16 +91,17 @@ ir ir_inst
 , .I_TDO(I_TDO)
 );
 
-dr dr_inst
-#(.ID_WIDTH(ID_WIDTH)
-, .USER_WIDTH(USER_WIDTH)
-, .ID_VALUE(ID_VALUE)
-, .USER_VALUE(USER_VALUE)
-, .BSR_WIDTH(BSR_WIDTH) 
-)
+dr #(
+   .ID_WIDTH(8)
+, .USER_WIDTH(8)
+, .ID_VALUE(8'hF1)
+, .USER_VALUE(8'hF1)
+, .BSR_WIDTH(10) 
+) dr_inst
 (
   .TRST(TRST)
 , .TCK(TCK)
+, .TLR(TLR)
 , .TDI(TDI)
 , .LATCH_IR(LATCH_IR)
 , .BSR(BSR)
@@ -99,17 +112,18 @@ dr dr_inst
 , .BSR_TDO(BSR_TDO)
 , .ID_TDO(ID_REG_TDO)
 , .USER_TDO(USER_REG_TDO)
+, .IO_CORE(IO_CORE)
 , .EXTERNAL_inREG(EXTERNAL_inREG)
-, .CORE_LOGIC(CORE_LOGIC)
+, .IO_CORE_LOGIC(IO_CORE_LOGIC)
 , .EXTERNAL_outREG(EXTERNAL_outREG)
-, .CORE_LOGIC_OUT(CORE_LOGIC_OUT)
+, .IO_CORE_LOGIC_OUT(IO_CORE_LOGIC_OUT)
 );
 
 core_logic core_logic_inst
 (
   .TCK(TCK)
-, .IN_CORE(IN_CORE)
-, .CORE_LOGIC(CORE_LOGIC)
+, .IO_CORE(IO_CORE)
+, .IO_CORE_LOGIC(IO_CORE_LOGIC)
 );
 
 state_decode state_decode_inst
@@ -143,11 +157,10 @@ always @ (posedge TCK) begin
 end
 
 always @ (posedge TCK) begin
-    if( UPDATE_DR & (INTEST_SELECT | SAMPLE_SELECT)) IN_CORE<= CORE_LOGIC_OUT;
+    if( UPDATE_DR & (INTEST_SELECT | SAMPLE_SELECT)) IO_CORE<= IO_CORE_LOGIC_OUT;
 end
 
-always @(ID_TDO or USER_TDO or BSR_TDO or BYPASS_TDO or I_TDO or TRST ...
-                or SHIFT_DR or SHIFT_IR or EXIT1DR) begin
+always @(ID_TDO or USER_TDO or BSR_TDO or BYPASS_TDO or I_TDO or TRST or SHIFT_DR or SHIFT_IR or EXIT1DR or IR) begin
     if (TRST)
     TDO = 1'bz;
     else if ( SHIFT_IR ) 

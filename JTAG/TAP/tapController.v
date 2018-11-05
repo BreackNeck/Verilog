@@ -9,6 +9,7 @@ module tapController
 ,   output reg ENABLE
     // output from STATE
 ,   output reg TLR
+,   output reg RTI
 ,   output reg UPDATE_IR
 ,   output reg UPDATE_DR
 ,   output reg CAPTURE_DR
@@ -147,18 +148,18 @@ begin
 	endcase
 end
 
-assign EXIT1_DR  = state == STATE_EXIT1_DR;
+assign EXIT1_DR  = State == STATE_EXIT1_DR;
 
 always @ (posedge TCK)
 begin
   ENABLE <= SHIFT_IR | SHIFT_DR;
 end
 
-assign MOD = state == STATE_CAPTURE_IR
-                | state == STATE_SHIFT_IR
-                | state == STATE_EXIT1_IR
-                | state == STATE_PAUSE_IR
-                | state == STATE_EXIT2_IR
-                | state == STATE_UPDATE_IR;
+assign MOD = State == STATE_CAPTURE_IR
+                | State == STATE_SHIFT_IR
+                | State == STATE_EXIT1_IR
+                | State == STATE_PAUSE_IR
+                | State == STATE_EXIT2_IR
+                | State == STATE_UPDATE_IR;
 
 endmodule

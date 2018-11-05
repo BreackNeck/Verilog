@@ -1,6 +1,6 @@
 FILE_tapController = TAP/tapController.v Testbenches/tap_controller_tb.v
 FILE_Decode_state = TAP/Decode_state.v Testbenches/state_decoder_tb.v
-FILE_TOPMODULE = TAP/TOPMODULE.v TAP/tapController.v TAP/IR.v TAP/DR.v TAP/IR_DEFINES.v Testbenches/topmodule_tb.v 
+FILE_TOPMODULE = TAP/TOPMODULE.v TAP/tapController.v TAP/IR.v TAP/DR.v TAP/IR_DEFINES.v TAP/Decode_state.v TAP/BYPASS.v TAP/CORE_LOGIC.v Testbenches/topmodule_tb.v 
 
 
 tapController_compile:
@@ -37,4 +37,9 @@ TOPMODULE_vvp:
 	vvp TOPMODULE
 
 TOPMODULE_gtk:
+	gtkwave topmodule_tb.vcd
+
+TOPMODULE_make:
+	iverilog -o TOPMODULE $(FILE_TOPMODULE)
+	vvp TOPMODULE
 	gtkwave topmodule_tb.vcd
