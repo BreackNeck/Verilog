@@ -7,7 +7,7 @@ module TOPMODULE
 ,   input      TCK
 ,   input      TRST
 ,   input      TDI
-,   output reg TDO  
+,   output     reg TDO  
 );
 
 reg  [3:0] EXTERNAL_inREG;

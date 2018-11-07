@@ -17,11 +17,11 @@ localparam IDCODE   = 4'h7;
 localparam USERCODE = 4'h8;
 localparam HIGHZ    = 4'h9;
 
-TOPMODULE ics_sample
+TOPMODULE TOPMODULE_inst
 ( 
   .TMS(TMS)
 , .TCK(TCK)
-//, .TRST(TRST)
+, .TRST(TRST)
 , .TDI(TDI)
 , .TDO(TDO)
 );
