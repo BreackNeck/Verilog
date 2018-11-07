@@ -3,19 +3,22 @@
 module TOPMODULE
 
 (
-    input      TMS
-,   input      TCK
-,   input      TRST
-,   input      TDI
-,   output     reg TDO  
+    input       TMS
+,   input       TCK
+,   input       TRST
+,   input       TDI
+,   output  reg TDO  
 );
 
 reg  [3:0] EXTERNAL_inREG;
-reg  [3:0] IO_IO_CORE_LOGIC;
 reg  [3:0] IO_CORE;
 
 wire [3:0] EXTERNAL_outREG;
 wire [3:0] IO_CORE_LOGIC_OUT;
+
+wire [3:0] IO_CORE_LOGIC;
+
+wire [3:0] LATCH_IR;
 
 wire       CAPTURE_IR;
 wire       SHIFT_IR;
@@ -25,7 +28,7 @@ wire       CAPTURE_DR;
 wire       SHIFT_DR;
 wire       UPDATE_DR;
 
-wire [7:0] BSR;
+wire [9:0] BSR;
 
 wire       MOD;
 wire       ENABLE;
@@ -78,7 +81,7 @@ tapController tapController_inst
 , .CAPTURE_DR(CAPTURE_DR)
 );
 
-IR #(.IR_DATA_WIDTH(4)) IR_inst 
+ir #(.IR_DATA_WIDTH(4)) ir_inst 
 (
   .TDI(TDI)
 , .TCK(TCK)
@@ -126,7 +129,7 @@ core_logic core_logic_inst
 , .IO_CORE_LOGIC(IO_CORE_LOGIC)
 );
 
-state_decode state_decode_inst
+state_decoder state_decoder_inst
 (
   .LATCH_IR(LATCH_IR)
 , .BYPASS_SELECT(BYPASS_SELECT)

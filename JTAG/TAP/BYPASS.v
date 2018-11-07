@@ -7,7 +7,7 @@ module bypass
 ,   input          TDI
 ,   input          TLR
 ,   input          TRST
-,   input          LATCH_IR
+,   input          [3:0] LATCH_IR
 ,   input          CAPTURE_DR
 ,   input          SHIFT_DR
 ,   output reg     BYPASS_TDO

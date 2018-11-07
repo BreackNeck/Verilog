@@ -14,7 +14,7 @@ module dr
 ,   input            TCK
 ,   input            TDI
 ,   input            ENABLE
-,   input            LATCH_IR
+,   input [3:0]         LATCH_IR
 ,   input            CAPTURE_DR
 ,   input            UPDATE_DR
 ,   input            SHIFT_DR

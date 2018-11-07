@@ -1,6 +1,6 @@
 FILE_tapController = TAP/tapController.v Testbenches/tap_controller_tb.v
 FILE_Decode_state = TAP/Decode_state.v Testbenches/state_decoder_tb.v
-FILE_TOPMODULE = TAP/TOPMODULE.v TAP/tapController.v TAP/IR.v TAP/DR.v TAP/IR_DEFINES.v TAP/Decode_state.v TAP/BYPASS.v TAP/CORE_LOGIC.v Testbenches/topmodule_tb.v 
+FILE_TOPMODULE = TAP/TOPMODULE.v TAP/tapController.v TAP/ir.v TAP/dr.v TAP/IR_DEFINES.v TAP/state_decoder.v TAP/bypass.v TAP/core_logic.v Testbenches/topmodule_tb.v 
 
 
 tapController_compile:

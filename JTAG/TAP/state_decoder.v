@@ -1,6 +1,6 @@
 //`include "IR_localparamS.v"
 
-module state_decode
+module state_decoder
 (
     input               [3:0] LATCH_IR
 ,   output reg          BYPASS_SELECT

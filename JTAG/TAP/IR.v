@@ -1,4 +1,4 @@
-module IR
+module ir
 #(   
 	parameter IR_DATA_WIDTH = 4  // IR_LENGTH PARAMETR
 )
@@ -9,8 +9,8 @@ module IR
 ,   input      UPDATE_IR
 ,   input      SHIFT_IR
 ,   input      CAPTURE_IR
-,   input      TLR
-,   output reg [3:0] LATCH_IR
+,   input                          TLR
+,   output reg [IR_DATA_WIDTH-1:0] LATCH_IR
 ,   output reg I_TDO
 );
 
@@ -28,7 +28,7 @@ if (TRST == 0)
   else if(CAPTURE_IR)
     IR <= 4'b0101;
   else if (SHIFT_IR)
-    IR[3:0] <= {TDI, IR[IR_DATA_WIDTH-1:1]};
+    IR <= {TDI, IR[IR_DATA_WIDTH-1:1]};
 end
 
 
