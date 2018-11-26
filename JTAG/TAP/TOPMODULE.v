@@ -1,184 +1,221 @@
-//`include "IR_DEFINES.v"
-
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date:    15:16:59 10/28/2018 
+// Design Name: 
+// Module Name:    TOPMODULE 
+// Project Name: 
+// Target Devices: 
+// Tool versions: 
+// Description: 
+//
+// Dependencies: 
+//
+// Revision: 
+// Revision 0.01 - File Created
+// Additional Comments: 
+//
+//////////////////////////////////////////////////////////////////////////////////
 module TOPMODULE
-
 (
-    input       TMS
-,   input       TCK
-,   input       TRST
-,   input       TDI
-,   output  reg TDO  
+    input            TMS       // J20: V14
+,   input            TCK       // J20: V15
+,   input            TDI       // J20: W16
+,   output reg       TDO       // J20: V16
+
+,   output           TMS_LA    // J18: AA21 : A0
+,   output           TCK_LA    // J18: AB21 : A1
+,   output           TDI_LA    // J18: AA19 : A2
+,   output           TDO_LA    // J18: AB19 : A3
+
+,   output     [3:0] state     // state[0] -> J15: AB3 : I1+ : 9pin  : A4
+										 // state[1] -> J15: AA6 : I2+ : 13pin : A5
+										 // state[2] -> J15: Y7  : I3+ : 21pin : A6
+										 // state[3] -> J15: AA8 : I4+ : 25pin : A7
+										 // �������� GPIO �������� 17 ������������ 
+                               // ��������� LA: 256 | 50 | 1 | 1
+										 // ��������� A1 Triger �� �������� �����
+										 
+,   output     [7:0] LEDs      // LEDs[7] : W21 : LED7
+										 // LEDs[6] : Y22 : LED6
+										 // LEDs[5] : V20 : LED5
+										 // LEDs[4] : V19 : LED4
+										 // LEDs[3] : U19 : LED3
+										 // LEDs[2] : U20 : LED2
+										 // LEDs[1] : T19 : LED1
+										 // LEDs[0] : R20 : LED0
+,   input      [3:0] TUMBLERS  // SW0 : TUMBLERS[0] : V8										 
+                               // SW1 : TUMBLERS[1] : U10
+										 // SW2 : TUMBLERS[2] : U8
+										 // SW3 : TUMBLERS[3] : T9
+
 );
 
-reg  [3:0] EXTERNAL_inREG;
-reg  [3:0] IO_CORE;
+// �������� ��� �������� � ����������� ������������
+reg [3:0] EXTEST_IO;
+reg [3:0] INTEST_CL;
 
-wire [3:0] EXTERNAL_outREG;
-wire [3:0] IO_CORE_LOGIC_OUT;
+// �������� ������� ��� �����������
+assign TMS_LA = TMS;
+assign TCK_LA = TCK;
+assign TDI_LA = TDI;
+assign TDO_LA = TDO;
 
-wire [3:0] IO_CORE_LOGIC;
+// ������� � �������� ����������
+wire       CAPTUREIR;
+wire       SHIFTIR;
+wire       UPDATEIR;
+wire       CAPTUREDR;
+wire       SHIFTDR;
+wire       UPDATEDR;
+wire       TLR;
 
-wire [3:0] LATCH_IR;
+// ������� ��� ������
+wire [3:0] LATCH_JTAG_IR;
 
-wire       CAPTURE_IR;
-wire       SHIFT_IR;
-wire       UPDATE_IR;
-
-wire       CAPTURE_DR;
-wire       SHIFT_DR;
-wire       UPDATE_DR;
-
-wire [9:0] BSR;
-
-wire       MOD;
-wire       ENABLE;
-wire       TRST;
-
-wire [3:0] IR;
-
-wire       EXIT1DR;
-
-wire       ID_TDO;
-wire       USER_TDO;
-wire       I_TDO;    
-wire       BSR_TDO;     
+// ��� TDO
+wire       INSTR_TDO;
+wire       ID_REG_TDO;
 wire       BYPASS_TDO;
+wire       BSR_TDO;
 
-wire BYPASS_SELECT;
-wire SAMPLE_SELECT;
-wire EXTEST_SELECT;
-wire INTEST_SELECT;
-wire RUNBIST_SELECT;
-wire CLAMP_SELECT;
-wire IDCODE_SELECT;
-wire USERCODE_SELECT;
-wire HIGHZ_SELECT;
+// ��������� �������
+wire       IDCODE_SELECT;
+wire       BYPASS_SELECT;
+wire       SAMPLE_SELECT;
+wire       EXTEST_SELECT;
+wire 		  INTEST_SELECT;
+wire		  USERCODE_SELECT;
 
-localparam BYPASS   = 4'hF;
-localparam SAMPLE   = 4'h1; 
-localparam EXTEST   = 4'h2; 
-localparam INTEST   = 4'h3; 
-localparam RUNBIST  = 4'h4; 
-localparam CLAMP    = 4'h5; 
-localparam IDCODE   = 4'h7; 
-localparam USERCODE = 4'h8; 
-localparam HIGHZ    = 4'h9;
+//
+wire [9:0] BSR;
+wire [3:0] CORE_LOGIC;
+wire [7:0] UR_OUT;
 
-tapController tapController_inst
+tap_controller test_access_port
 ( 
   .TMS(TMS)
 , .TCK(TCK)
-, .TRST(TRST)
-, .MOD(MOD)
-, .ENABLE(ENABLE)
+
+, .state_out(state)
+
+, .CAPTUREIR(CAPTUREIR)
+, .SHIFTIR(SHIFTIR)
+, .UPDATEIR(UPDATEIR)
+, .CAPTUREDR(CAPTUREDR)
+, .SHIFTDR(SHIFTDR)
+, .UPDATEDR(UPDATEDR)
+
 , .TLR(TLR)
-, .EXIT1_DR(EXIT1_DR)
-, .UPDATE_IR(UPDATE_IR)
-, .SHIFT_IR(SHIFT_IR)
-, .UPDATE_DR(UPDATE_DR)
-, .SHIFT_DR(SHIFT_DR)
-, .CAPTURE_IR(CAPTURE_IR)
-, .CAPTURE_DR(CAPTURE_DR)
 );
 
-ir #(.IR_DATA_WIDTH(4)) ir_inst 
+ir instruction_register
 (
   .TDI(TDI)
 , .TCK(TCK)
-, .TRST(TRST)
-, .UPDATE_IR(UPDATE_IR)
-, .SHIFT_IR(SHIFT_IR)
-, .CAPTURE_IR(CAPTURE_IR)
-, .LATCH_IR(LATCH_IR)
 , .TLR(TLR)
-, .I_TDO(I_TDO)
+, .CAPTUREIR(CAPTUREIR)
+, .SHIFTIR(SHIFTIR)
+, .UPDATEIR(UPDATEIR)
+, .INSTR_TDO(INSTR_TDO)
+, .LATCH_JTAG_IR(LATCH_JTAG_IR)
 );
 
-dr #(
-   .ID_WIDTH(8)
-, .USER_WIDTH(8)
-, .ID_VALUE(8'hF1)
-, .USER_VALUE(8'hF1)
-, .BSR_WIDTH(10) 
-) dr_inst
+state_decoder state_decoder_sample
 (
-  .TRST(TRST)
-, .TCK(TCK)
-, .TLR(TLR)
+  .LATCH_JTAG_IR(LATCH_JTAG_IR)
+, .IDCODE_SELECT(IDCODE_SELECT)
+, .BYPASS_SELECT(BYPASS_SELECT)
+, .EXTEST_SELECT(EXTEST_SELECT)
+, .SAMPLE_SELECT(SAMPLE_SELECT)
+, .INTEST_SELECT(INTEST_SELECT)
+, .USERCODE_SELECT(USERCODE_SELECT)
+);
+
+dr test_data_register
+(
+  .TCK(TCK)
 , .TDI(TDI)
-, .LATCH_IR(LATCH_IR)
-, .BSR(BSR)
-, .UPDATE_DR(UPDATE_DR)
-, .SHIFT_DR(SHIFT_DR)
-, .CAPTURE_DR(CAPTURE_DR)
-, .ENABLE(ENABLE)
+, .SHIFTDR(SHIFTDR)
+, .CAPTUREDR(CAPTUREDR)
+, .UPDATEDR(UPDATEDR)
+, .IDCODE_SELECT(IDCODE_SELECT)
+, .SAMPLE_SELECT(SAMPLE_SELECT)
+, .EXTEST_SELECT(EXTEST_SELECT)
+, .INTEST_SELECT(INTEST_SELECT)
+, .USERCODE_SELECT(USERCODE_SELECT)
+, .CORE_LOGIC(CORE_LOGIC)
+, .ID_REG_TDO(ID_REG_TDO)
 , .BSR_TDO(BSR_TDO)
-, .ID_TDO(ID_REG_TDO)
-, .USER_TDO(USER_REG_TDO)
-, .IO_CORE(IO_CORE)
-, .EXTERNAL_inREG(EXTERNAL_inREG)
-, .IO_CORE_LOGIC(IO_CORE_LOGIC)
-, .EXTERNAL_outREG(EXTERNAL_outREG)
-, .IO_CORE_LOGIC_OUT(IO_CORE_LOGIC_OUT)
+, .BSR(BSR)
+, .TUMBLERS(TUMBLERS)
+, .EXTEST_IO(EXTEST_IO)
+, .INTEST_CL(INTEST_CL)
+, .UR_OUT(UR_OUT)
+);
+
+bypass bypass_tar
+(
+  .TCK(TCK)
+, .TDI(TDI)
+, .SHIFTDR(SHIFTDR)
+, .BYPASS_TDO(BYPASS_TDO)
 );
 
 core_logic core_logic_inst
 (
   .TCK(TCK)
-, .IO_CORE(IO_CORE)
-, .IO_CORE_LOGIC(IO_CORE_LOGIC)
+, .data_in(INTEST_CL)
+, .data_out(CORE_LOGIC)
 );
 
-state_decoder state_decoder_inst
-(
-  .LATCH_IR(LATCH_IR)
-, .BYPASS_SELECT(BYPASS_SELECT)
-, .SAMPLE_SELECT(SAMPLE_SELECT)
-, .EXTEST_SELECT(EXTEST_SELECT)
-, .INTEST_SELECT(INTEST_SELECT)
-, .RUNBIST_SELECT(RUNBIST_SELECT)
-, .CLAMP_SELECT(CLAMP_SELECT)
-, .IDCODE_SELECT(IDCODE_SELECT)
-, .USERCODE_SELECT(USERCODE_SELECT)
-, .HIGHZ_SELECT(HIGHZ_SELECT)
-);
-
-bypass bypass_inst
-(
-  .TCK(TCK)
-, .TDI(TDI)
-, .TLR(TLR)
-, .TRST(TRST)
-, .LATCH_IR(LATCH_IR)
-, .CAPTURE_DR(CAPTURE_DR)
-, .SHIFT_DR(SHIFT_DR)
-, .BYPASS_TDO(BYPASS_TDO)
-);
-
-always @ (posedge TCK) begin
-    if( UPDATE_DR & (EXTEST_SELECT | SAMPLE_SELECT)) EXTERNAL_inREG <= EXTERNAL_outREG;
+always @(posedge TCK) begin
+    if( UPDATEDR & SAMPLE_SELECT ) begin
+		EXTEST_IO <= BSR[9:6];		
+	   INTEST_CL <= BSR[5:2];
+	 end else 
+	 if( UPDATEDR & EXTEST_SELECT ) begin
+		EXTEST_IO <= BSR[9:6];
+	 end else
+	 if( UPDATEDR & INTEST_SELECT ) begin
+		INTEST_CL <= BSR[5:2];
+	 end
 end
 
-always @ (posedge TCK) begin
-    if( UPDATE_DR & (INTEST_SELECT | SAMPLE_SELECT)) IO_CORE<= IO_CORE_LOGIC_OUT;
-end
+localparam IDCODE   = 4'h7;
+localparam BYPASS   = 4'hF;
+localparam SAMPLE   = 4'h1;
+localparam EXTEST   = 4'h2;
+localparam INTEST   = 4'h3;
+localparam USERCODE = 4'h8;
 
-always @(ID_TDO or USER_TDO or BSR_TDO or BYPASS_TDO or I_TDO or TRST or SHIFT_DR or SHIFT_IR or EXIT1DR or IR) begin
-    if (TRST)
-    TDO = 1'bz;
-    else if ( SHIFT_IR ) 
-        TDO <= I_TDO; 
-    else begin
-        case(IR)
-            IDCODE:   begin TDO <= ID_TDO;       end
-            USERCODE: begin TDO <= USER_TDO;     end
-            EXTEST:   begin TDO <= BSR_TDO;      end
-            BYPASS:   begin TDO <= BYPASS_TDO;   end
-            INTEST:   begin TDO <= BSR_TDO;      end
-            SAMPLE:   begin TDO <= BSR_TDO;      end
-            default:  begin TDO <= BYPASS_TDO;   end
-        endcase 
+always @(posedge TCK) begin
+    if ( SHIFTDR ) begin
+        case(LATCH_JTAG_IR)
+            IDCODE:     begin TDO <= ID_REG_TDO;       end
+				BYPASS:     begin TDO <= BYPASS_TDO;       end
+				SAMPLE:     begin TDO <= BSR_TDO;          end
+				EXTEST:     begin TDO <= BSR_TDO;          end
+				INTEST:     begin TDO <= BSR_TDO;          end
+				USERCODE:   begin TDO <= BSR_TDO;          end
+            default:    begin TDO <= ID_REG_TDO;       end
+        endcase  
+    end else
+	 if ( SHIFTIR ) begin
+        TDO <= INSTR_TDO; 
     end
 end
+
+assign LEDs[0] = INTEST_SELECT ? INTEST_CL[0] : SAMPLE_SELECT ? EXTEST_IO[0] : TUMBLERS[0];
+assign LEDs[1] = INTEST_SELECT ? INTEST_CL[1] : SAMPLE_SELECT ? EXTEST_IO[1] : TUMBLERS[1];
+assign LEDs[2] = INTEST_SELECT ? INTEST_CL[2] : SAMPLE_SELECT ? EXTEST_IO[2] : TUMBLERS[2];
+assign LEDs[3] = INTEST_SELECT ? INTEST_CL[3] : SAMPLE_SELECT ? EXTEST_IO[3] : TUMBLERS[3];
+
+assign LEDs[4] = INTEST_SELECT ? CORE_LOGIC[0] : SAMPLE_SELECT ? INTEST_CL[0] : EXTEST_IO[0];
+assign LEDs[5] = INTEST_SELECT ? CORE_LOGIC[1] : SAMPLE_SELECT ? INTEST_CL[1] : EXTEST_IO[1];
+assign LEDs[6] = INTEST_SELECT ? CORE_LOGIC[2] : SAMPLE_SELECT ? INTEST_CL[2] : EXTEST_IO[2];
+assign LEDs[7] = INTEST_SELECT ? CORE_LOGIC[3] : SAMPLE_SELECT ? INTEST_CL[3] : EXTEST_IO[3];
 
 endmodule

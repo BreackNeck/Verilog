@@ -1,54 +1,11 @@
-`timescale 1ns / 1ps
+`timescale 1 ns / 1 ns
+module topmodule_tb();
 
-////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer:
-//
-// Create Date:   15:00:57 10/28/2018
-// Design Name:   ics
-// Module Name:   /home/de/Documents/JTAG/tap_controller/ics_tb.v
-// Project Name:  tap_controller
-// Target Device:  
-// Tool versions:  
-// Description: 
-//
-// Verilog Test Fixture created by ISE for module: ics
-//
-// Dependencies:
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-////////////////////////////////////////////////////////////////////////////////
-
-module ics_tb;
-
-	// Inputs
-	reg TMS;
-	reg TCK;
-	reg TDI;
-
-	// Outputs
-	wire TDO;
-	wire [3:0] IO;
-	wire TMS_LA;
-	wire TCK_LA;
-	wire TDI_LA;
-	wire TDO_LA;
-
-	// Instantiate the Unit Under Test (UUT)
-	ics uut (
-		.TMS(TMS), 
-		.TCK(TCK), 
-		.TDI(TDI), 
-		.TDO(TDO), 
-		.IO(IO), 
-		.TMS_LA(TMS_LA), 
-		.TCK_LA(TCK_LA), 
-		.TDI_LA(TDI_LA), 
-		.TDO_LA(TDO_LA)
-	);
+reg  TMS;
+reg  TCK;
+reg  TRST;
+reg  TDI;
+wire TDO;
 
 localparam BYPASS   = 4'hF;
 localparam SAMPLE   = 4'h1;
@@ -60,13 +17,24 @@ localparam IDCODE   = 4'h7;
 localparam USERCODE = 4'h8;
 localparam HIGHZ    = 4'h9;
 
+TOPMODULE ics_sample
+( 
+  .TMS(TMS)
+, .TCK(TCK)
+//, .TRST(TRST)
+, .TDI(TDI)
+, .TDO(TDO)
+);
+
 always begin
    #5  TCK <= ~TCK; // 200MHz
 end
 
 initial begin
-   TCK = 0; TMS = 1; TDI = 0; @(posedge TCK);
-end 
+   TCK = 0; TMS = 1; TRST = 0; TDI = 0; @(posedge TCK);
+   TRST = 1;                            @(posedge TCK);
+   TRST = 0;                            @(posedge TCK);
+end  
 
 task command;
   input [3:0] cmd;
@@ -123,7 +91,6 @@ task data;
   end 
 endtask
 
-
 initial begin
 
   repeat(5) @(negedge TCK); // Test Logic Reset <- F
@@ -137,6 +104,9 @@ initial begin
   repeat(10) @(posedge TCK); $finish;
 end
 
-      
-endmodule
+initial begin
+  $dumpfile("topmodule_tb.vcd");
+  $dumpvars(-1, topmodule_tb);
+end
 
+endmodule

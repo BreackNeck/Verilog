@@ -1,24 +1,24 @@
-FILE_tapController = TAP/tapController.v Testbenches/tap_controller_tb.v
-FILE_Decode_state = TAP/Decode_state.v Testbenches/state_decoder_tb.v
-FILE_TOPMODULE = TAP/TOPMODULE.v TAP/tapController.v TAP/ir.v TAP/dr.v TAP/IR_DEFINES.v TAP/state_decoder.v TAP/bypass.v TAP/core_logic.v Testbenches/topmodule_tb.v 
+FILE_tap_controller = TAP/tap_controller.v Testbenches/tap_controller_tb.v
+FILE_state_decoder = TAP/state_decoder.v Testbenches/state_decoder_tb.v
+FILE_TOPMODULE = TAP/TOPMODULE.v TAP/tap_controller.v TAP/ir.v TAP/dr.v TAP/IR_DEFINES.v TAP/state_decoder.v TAP/bypass.v TAP/core_logic.v Testbenches/topmodule_tb.v 
 
 
-tapController_compile:
-	iverilog -o tapController $(FILE_tapController)
+tap_controller_compile:
+	iverilog -o tap_controller $(FILE_tap_controller)
 
-tapController_vvp:
-	vvp tapController
+tap_controller_vvp:
+	vvp tap_controller
 
-tapController_gtk:
-	gtkwave tapController_tb.vcd
+tap_controller_gtk:
+	gtkwave tap_controller_tb.vcd
 
-Decode_state_compile:
-	iverilog -o Decode_state $(FILE_Decode_state)
+state_decoder_compile:
+	iverilog -o state_decoder $(FILE_state_decoder)
 
-Decode_state_vvp:
-	vvp Decode_state
+state_decoder_vvp:
+	vvp state_decoder
 
-Decode_state_gtk:
+state_decoder_gtk:
 	gtkwave state_decoder_tb.vcd
 
 CORE_LOGIC_compile:
