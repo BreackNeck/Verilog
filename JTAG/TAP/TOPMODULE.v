@@ -34,7 +34,7 @@ module TOPMODULE
 										 // state[1] -> J15: AA6 : I2+ : 13pin : A5
 										 // state[2] -> J15: Y7  : I3+ : 21pin : A6
 										 // state[3] -> J15: AA8 : I4+ : 25pin : A7
-										 // �������� GPIO �������� 17 ������������ 
+										 // �������� GPIO �������� 17 ������������
                                // ��������� LA: 256 | 50 | 1 | 1
 										 // ��������� A1 Triger �� �������� �����
 										 
@@ -194,13 +194,13 @@ localparam USERCODE = 4'h8;
 always @(posedge TCK) begin
     if ( SHIFTDR ) begin
         case(LATCH_JTAG_IR)
-            IDCODE:     begin TDO <= ID_REG_TDO;       end
+           		IDCODE:     begin TDO <= ID_REG_TDO;       end
 				BYPASS:     begin TDO <= BYPASS_TDO;       end
 				SAMPLE:     begin TDO <= BSR_TDO;          end
 				EXTEST:     begin TDO <= BSR_TDO;          end
 				INTEST:     begin TDO <= BSR_TDO;          end
 				USERCODE:   begin TDO <= BSR_TDO;          end
-            default:    begin TDO <= ID_REG_TDO;       end
+            	default:    begin TDO <= ID_REG_TDO;       end
         endcase  
     end else
 	 if ( SHIFTIR ) begin

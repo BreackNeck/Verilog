@@ -22,7 +22,7 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module ics_tb;
+module topmodule_tb;
 
 	// Inputs
 	reg TMS;
@@ -31,19 +31,19 @@ module ics_tb;
 
 	// Outputs
 	wire TDO;
-	wire [3:0] IO;
+	//wire [3:0] IO;
 	wire TMS_LA;
 	wire TCK_LA;
 	wire TDI_LA;
 	wire TDO_LA;
 
 	// Instantiate the Unit Under Test (UUT)
-	ics uut (
+	TOPMODULE uut (
 		.TMS(TMS), 
 		.TCK(TCK), 
 		.TDI(TDI), 
 		.TDO(TDO), 
-		.IO(IO), 
+		//.IO(IO), 
 		.TMS_LA(TMS_LA), 
 		.TCK_LA(TCK_LA), 
 		.TDI_LA(TDI_LA), 
@@ -128,15 +128,19 @@ initial begin
 
   repeat(5) @(negedge TCK); // Test Logic Reset <- F
 
-  command(BYPASS); data(8'b10000001);
+  //command(BYPASS); data(8'b10000001);
   command(SAMPLE); data(8'b10100101);
-  command(EXTEST); data(8'b01101111);
-  command(INTEST); data(8'b01101111);
-  command(BYPASS); data(8'b10000001);
+  //command(EXTEST); data(8'b01101111);
+  //command(INTEST); data(8'b01101111);
+  //command(BYPASS); data(8'b10000001);
   
   repeat(10) @(posedge TCK); $finish;
 end
 
+initial begin
+  $dumpfile("topmodule_tb.vcd");
+  $dumpvars(-1, topmodule_tb);
+end
       
 endmodule
 

@@ -127,7 +127,7 @@ always @(negedge TCK) begin
         STATE_SHIFT_DR:         begin SHIFTDR         <= 1'b1; end
         STATE_CAPTURE_DR:       begin CAPTUREDR       <= 1'b1; end
         STATE_CAPTURE_IR:       begin CAPTUREIR       <= 1'b1; end
-		  STATE_TEST_LOGIC_RESET: begin TLR             <= 1'b1; end
+		STATE_TEST_LOGIC_RESET: begin TLR             <= 1'b1; end
     endcase
 end
 

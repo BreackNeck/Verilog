@@ -1,0 +1,392 @@
+#-----------------------------------------------------------
+# Vivado v2017.4 (64-bit)
+# SW Build 2086221 on Fri Dec 15 20:55:39 MST 2017
+# IP Build 2085800 on Fri Dec 15 22:25:07 MST 2017
+# Start of session at: Tue Nov 27 07:48:23 2018
+# Process ID: 7652
+# Current directory: C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/JTAG_project/JTAG_project.runs/synth_1
+# Command line: vivado.exe -log TOPMODULE.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source TOPMODULE.tcl
+# Log file: C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/JTAG_project/JTAG_project.runs/synth_1/TOPMODULE.vds
+# Journal file: C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/JTAG_project/JTAG_project.runs/synth_1\vivado.jou
+#-----------------------------------------------------------
+source TOPMODULE.tcl -notrace
+Command: synth_design -top TOPMODULE -part xc7z020clg484-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7z020'
+INFO: Launching helper process for spawning children vivado processes
+INFO: Helper process launched with PID 12048 
+---------------------------------------------------------------------------------
+Starting Synthesize : Time (s): cpu = 00:00:08 ; elapsed = 00:00:10 . Memory (MB): peak = 335.414 ; gain = 102.441
+---------------------------------------------------------------------------------
+INFO: [Synth 8-638] synthesizing module 'TOPMODULE' [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/TOPMODULE.v:21]
+	Parameter IDCODE bound to: 4'b0111 
+	Parameter BYPASS bound to: 4'b1111 
+	Parameter SAMPLE bound to: 4'b0001 
+	Parameter EXTEST bound to: 4'b0010 
+	Parameter INTEST bound to: 4'b0011 
+	Parameter USERCODE bound to: 4'b1000 
+INFO: [Synth 8-638] synthesizing module 'tap_controller' [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/tap_controller.v:1]
+	Parameter STATE_TEST_LOGIC_RESET bound to: 4'b1111 
+	Parameter STATE_RUN_TEST_IDLE bound to: 4'b1100 
+	Parameter STATE_SELECT_DR_SCAN bound to: 4'b0111 
+	Parameter STATE_CAPTURE_DR bound to: 4'b0110 
+	Parameter STATE_SHIFT_DR bound to: 4'b0010 
+	Parameter STATE_EXIT1_DR bound to: 4'b0001 
+	Parameter STATE_PAUSE_DR bound to: 4'b0011 
+	Parameter STATE_EXIT2_DR bound to: 4'b0000 
+	Parameter STATE_UPDATE_DR bound to: 4'b0101 
+	Parameter STATE_SELECT_IR_SCAN bound to: 4'b0100 
+	Parameter STATE_CAPTURE_IR bound to: 4'b1110 
+	Parameter STATE_SHIFT_IR bound to: 4'b1010 
+	Parameter STATE_EXIT1_IR bound to: 4'b1001 
+	Parameter STATE_PAUSE_IR bound to: 4'b1011 
+	Parameter STATE_EXIT2_IR bound to: 4'b1000 
+	Parameter STATE_UPDATE_IR bound to: 4'b1101 
+INFO: [Synth 8-226] default block is never used [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/tap_controller.v:44]
+INFO: [Synth 8-155] case statement is not full and has no default [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/tap_controller.v:123]
+INFO: [Synth 8-256] done synthesizing module 'tap_controller' (1#1) [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/tap_controller.v:1]
+INFO: [Synth 8-638] synthesizing module 'ir' [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/ir.v:1]
+	Parameter IDCODE bound to: 4'b0111 
+INFO: [Synth 8-256] done synthesizing module 'ir' (2#1) [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/ir.v:1]
+INFO: [Synth 8-638] synthesizing module 'state_decoder' [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/state_decoder.v:1]
+	Parameter IDCODE bound to: 4'b0111 
+	Parameter BYPASS bound to: 4'b1111 
+	Parameter SAMPLE bound to: 4'b0001 
+	Parameter EXTEST bound to: 4'b0010 
+	Parameter INTEST bound to: 4'b0011 
+	Parameter USERCODE bound to: 4'b1000 
+INFO: [Synth 8-256] done synthesizing module 'state_decoder' (3#1) [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/state_decoder.v:1]
+INFO: [Synth 8-638] synthesizing module 'dr' [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/dr.v:1]
+	Parameter LSB bound to: 2'b01 
+	Parameter PRELOAD_DATA bound to: 8'b10000001 
+WARNING: [Synth 8-3848] Net USERCODE_REG_TDO in module/entity dr does not have driver. [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/dr.v:11]
+INFO: [Synth 8-256] done synthesizing module 'dr' (4#1) [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/dr.v:1]
+WARNING: [Synth 8-350] instance 'test_data_register' of module 'dr' requires 19 connections, but only 18 given [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/TOPMODULE.v:137]
+INFO: [Synth 8-638] synthesizing module 'bypass' [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/bypass.v:1]
+INFO: [Synth 8-256] done synthesizing module 'bypass' (5#1) [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/bypass.v:1]
+INFO: [Synth 8-638] synthesizing module 'core_logic' [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/core_logic.v:1]
+INFO: [Synth 8-256] done synthesizing module 'core_logic' (6#1) [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/core_logic.v:1]
+INFO: [Synth 8-256] done synthesizing module 'TOPMODULE' (7#1) [C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/TOPMODULE.v:21]
+WARNING: [Synth 8-3331] design core_logic has unconnected port TCK
+WARNING: [Synth 8-3331] design dr has unconnected port USERCODE_REG_TDO
+WARNING: [Synth 8-3331] design ir has unconnected port CAPTUREIR
+---------------------------------------------------------------------------------
+Finished Synthesize : Time (s): cpu = 00:00:10 ; elapsed = 00:00:12 . Memory (MB): peak = 387.426 ; gain = 154.453
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:10 ; elapsed = 00:00:12 . Memory (MB): peak = 387.426 ; gain = 154.453
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7z020clg484-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:10 ; elapsed = 00:00:12 . Memory (MB): peak = 387.426 ; gain = 154.453
+---------------------------------------------------------------------------------
+INFO: [Synth 8-802] inferred FSM for state register 'state_reg' in module 'tap_controller'
+INFO: [Synth 8-5544] ROM "TLR" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "CAPTUREDR" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "CAPTUREIR" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "SHIFTDR" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "UPDATEDR" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "SHIFTIR" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "UPDATEIR" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "state" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+INFO: [Device 21-403] Loading part xc7z020clg484-1
+INFO: [Synth 8-5544] ROM "IDCODE_SELECT" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "BYPASS_SELECT" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "SAMPLE_SELECT" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "EXTEST_SELECT" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "INTEST_SELECT" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "USERCODE_SELECT" won't be mapped to Block RAM because address size (4) smaller than threshold (5)
+INFO: [Synth 8-5544] ROM "BSR" won't be mapped to Block RAM because address size (1) smaller than threshold (5)
+---------------------------------------------------------------------------------------------------
+                   State |                     New Encoding |                Previous Encoding 
+---------------------------------------------------------------------------------------------------
+          STATE_EXIT2_DR |                             0000 |                             0000
+          STATE_SHIFT_DR |                             0001 |                             0010
+          STATE_EXIT1_DR |                             0010 |                             0001
+         STATE_UPDATE_DR |                             0011 |                             0101
+     STATE_RUN_TEST_IDLE |                             0100 |                             1100
+    STATE_SELECT_DR_SCAN |                             0101 |                             0111
+    STATE_SELECT_IR_SCAN |                             0110 |                             0100
+  STATE_TEST_LOGIC_RESET |                             0111 |                             1111
+        STATE_CAPTURE_IR |                             1000 |                             1110
+          STATE_SHIFT_IR |                             1001 |                             1010
+          STATE_EXIT1_IR |                             1010 |                             1001
+          STATE_PAUSE_IR |                             1011 |                             1011
+          STATE_EXIT2_IR |                             1100 |                             1000
+         STATE_UPDATE_IR |                             1101 |                             1101
+        STATE_CAPTURE_DR |                             1110 |                             0110
+          STATE_PAUSE_DR |                             1111 |                             0011
+---------------------------------------------------------------------------------------------------
+INFO: [Synth 8-3354] encoded FSM with state register 'state_reg' using encoding 'sequential' in module 'tap_controller'
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:10 ; elapsed = 00:00:12 . Memory (MB): peak = 387.426 ; gain = 154.453
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+No constraint files found.
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---Registers : 
+	               10 Bit    Registers := 1     
+	                8 Bit    Registers := 2     
+	                4 Bit    Registers := 4     
+	                1 Bit    Registers := 2     
++---Muxes : 
+	   2 Input     10 Bit        Muxes := 5     
+	   2 Input      8 Bit        Muxes := 1     
+	  16 Input      4 Bit        Muxes := 1     
+	  32 Input      4 Bit        Muxes := 1     
+	   8 Input      1 Bit        Muxes := 7     
+	   7 Input      1 Bit        Muxes := 6     
+	   2 Input      1 Bit        Muxes := 23    
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Hierarchical Component Statistics 
+---------------------------------------------------------------------------------
+Hierarchical RTL Component report 
+Module TOPMODULE 
+Detailed RTL Component Info : 
++---Registers : 
+	                4 Bit    Registers := 2     
+	                1 Bit    Registers := 1     
++---Muxes : 
+	   2 Input      1 Bit        Muxes := 20    
+Module tap_controller 
+Detailed RTL Component Info : 
++---Muxes : 
+	  16 Input      4 Bit        Muxes := 1     
+	  32 Input      4 Bit        Muxes := 1     
+	   8 Input      1 Bit        Muxes := 7     
+Module ir 
+Detailed RTL Component Info : 
++---Registers : 
+	                4 Bit    Registers := 2     
+Module state_decoder 
+Detailed RTL Component Info : 
++---Muxes : 
+	   7 Input      1 Bit        Muxes := 6     
+Module dr 
+Detailed RTL Component Info : 
++---Registers : 
+	               10 Bit    Registers := 1     
+	                8 Bit    Registers := 2     
++---Muxes : 
+	   2 Input     10 Bit        Muxes := 5     
+	   2 Input      8 Bit        Muxes := 1     
+	   2 Input      1 Bit        Muxes := 3     
+Module bypass 
+Detailed RTL Component Info : 
++---Registers : 
+	                1 Bit    Registers := 1     
+---------------------------------------------------------------------------------
+Finished RTL Hierarchical Component Statistics
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 220 (col length:60)
+BRAMs: 280 (col length: RAMB18 60 RAMB36 30)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+No constraint files found.
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+WARNING: [Synth 8-3332] Sequential element (test_access_port/CAPTUREIR_reg) is unused and will be removed from module TOPMODULE.
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:00:17 ; elapsed = 00:00:22 . Memory (MB): peak = 553.566 ; gain = 320.594
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+No constraint files found.
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:00:17 ; elapsed = 00:00:22 . Memory (MB): peak = 553.566 ; gain = 320.594
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:00:17 ; elapsed = 00:00:22 . Memory (MB): peak = 553.695 ; gain = 320.723
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:00:18 ; elapsed = 00:00:24 . Memory (MB): peak = 553.695 ; gain = 320.723
+---------------------------------------------------------------------------------
+
+Report Check Netlist: 
++------+------------------+-------+---------+-------+------------------+
+|      |Item              |Errors |Warnings |Status |Description       |
++------+------------------+-------+---------+-------+------------------+
+|1     |multi_driven_nets |      0|        0|Passed |Multi driven nets |
++------+------------------+-------+---------+-------+------------------+
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:00:18 ; elapsed = 00:00:24 . Memory (MB): peak = 553.695 ; gain = 320.723
+---------------------------------------------------------------------------------
+
+Report RTL Partitions: 
++-+--------------+------------+----------+
+| |RTL Partition |Replication |Instances |
++-+--------------+------------+----------+
++-+--------------+------------+----------+
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:00:18 ; elapsed = 00:00:24 . Memory (MB): peak = 553.695 ; gain = 320.723
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:00:18 ; elapsed = 00:00:24 . Memory (MB): peak = 553.695 ; gain = 320.723
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:18 ; elapsed = 00:00:24 . Memory (MB): peak = 553.695 ; gain = 320.723
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:00:18 ; elapsed = 00:00:24 . Memory (MB): peak = 553.695 ; gain = 320.723
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+
+Static Shift Register Report:
++------------+---------------------------------------+--------+-------+--------------+--------------------+-------------------+--------+---------+
+|Module Name | RTL Name                              | Length | Width | Reset Signal | Pull out first Reg | Pull out last Reg | SRL16E | SRLC32E | 
++------------+---------------------------------------+--------+-------+--------------+--------------------+-------------------+--------+---------+
+|TOPMODULE   | test_data_register/ID_REG_COPY_reg[1] | 4      | 1     | YES          | NO                 | YES               | 1      | 0       | 
++------------+---------------------------------------+--------+-------+--------------+--------------------+-------------------+--------+---------+
+
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP and Shift Register Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+-------+------+
+|      |Cell   |Count |
++------+-------+------+
+|1     |BUFG   |     1|
+|2     |LUT2   |     4|
+|3     |LUT3   |     6|
+|4     |LUT4   |    17|
+|5     |LUT5   |    18|
+|6     |LUT6   |    24|
+|7     |SRL16E |     1|
+|8     |FDRE   |    53|
+|9     |FDSE   |     6|
+|10    |IBUF   |     7|
+|11    |OBUF   |    17|
++------+-------+------+
+
+Report Instance Areas: 
++------+-----------------------+---------------+------+
+|      |Instance               |Module         |Cells |
++------+-----------------------+---------------+------+
+|1     |top                    |               |   154|
+|2     |  bypass_tar           |bypass         |     2|
+|3     |  instruction_register |ir             |    54|
+|4     |  test_access_port     |tap_controller |    26|
+|5     |  test_data_register   |dr             |    38|
++------+-----------------------+---------------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:00:18 ; elapsed = 00:00:24 . Memory (MB): peak = 553.695 ; gain = 320.723
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 6 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:00:18 ; elapsed = 00:00:24 . Memory (MB): peak = 553.695 ; gain = 320.723
+Synthesis Optimization Complete : Time (s): cpu = 00:00:18 ; elapsed = 00:00:24 . Memory (MB): peak = 553.695 ; gain = 320.723
+INFO: [Project 1-571] Translating synthesized netlist
+INFO: [Netlist 29-17] Analyzing 7 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 0 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+INFO: [Common 17-83] Releasing license: Synthesis
+57 Infos, 6 Warnings, 0 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:00:24 ; elapsed = 00:00:36 . Memory (MB): peak = 660.141 ; gain = 433.328
+INFO: [Common 17-1381] The checkpoint 'C:/Users/Breac_000/YandexDisk/Work Projects/Verilog/JTAG/TAP/JTAG_project/JTAG_project.runs/synth_1/TOPMODULE.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file TOPMODULE_utilization_synth.rpt -pb TOPMODULE_utilization_synth.pb
+report_utilization: Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.167 . Memory (MB): peak = 660.141 ; gain = 0.000
+INFO: [Common 17-206] Exiting Vivado at Tue Nov 27 07:49:06 2018...
