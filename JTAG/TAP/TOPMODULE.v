@@ -19,6 +19,17 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module TOPMODULE
+#(
+/*
+relation RAM DEPTH = 2 ^ (ADDRESS WIDTH)
+ADDRESS WIDTH = log (base 2) RAM DEPTH.
+The $clog2 system task was added to the SystemVerilog extension to Verilog (IEEE Std 1800-2005). 
+This returns an integer which has the value of the ceiling of the log base 2. 
+The DEPTH need not be a power of 2.
+*/
+    parameter DEPTH = 6;
+    parameter WIDTH = $clog2(DEPTH);
+)
 (
     input            TMS       // J20: V14
 ,   input            TCK       // J20: V15
@@ -86,14 +97,21 @@ wire       IDCODE_SELECT;
 wire       BYPASS_SELECT;
 wire       SAMPLE_SELECT;
 wire       EXTEST_SELECT;
-wire 		  INTEST_SELECT;
-wire		  USERCODE_SELECT;
+wire       INTEST_SELECT;
+wire	   USERCODE_SELECT;
+wire       RUNBIST_SELECT;
 
 //
 wire [9:0] BSR;
 wire [3:0] CORE_LOGIC;
 wire [7:0] UR_OUT;
+wire [7:0] IR_REG_OUT;
+wire [7:0] BIST_LOG;
 
+wire       RESET_SM;
+wire       error;
+wire [3:0] CL_INPUT;
+wire       ASSIGN_STATE;
 tap_controller test_access_port
 ( 
   .TMS(TMS)
@@ -154,6 +172,8 @@ dr test_data_register
 , .EXTEST_IO(EXTEST_IO)
 , .INTEST_CL(INTEST_CL)
 , .UR_OUT(UR_OUT)
+, .BIST_LOG(BIST_LOG)
+, .RUNBIST_SELECT(RUNBIST_SELECT)
 );
 
 bypass bypass_tar
@@ -167,8 +187,34 @@ bypass bypass_tar
 core_logic core_logic_inst
 (
   .TCK(TCK)
-, .data_in(INTEST_CL)
-, .data_out(CORE_LOGIC)
+, .clk(clk) 
+, .TLR(TLR) 
+, .RESET_SM(RESET_SM)
+, .X(CL_INPUT)
+, .Y(CORE_LOGIC)
+, .ASSIGN_STATE(ASSIGN_STATE)
+, .RUNBIST_SELECT(RUNBIST_SELECT)
+, .INTEST_SELECT(INTEST_SELECT)
+, .TUMBLERS(ASSIGN_STATE)
+);
+
+BIST #(.DEPTH(DEPTH), .WIDTH(WIDTH)) BIST_INST
+(
+  .TCK(TCK)
+, .clk(clk)
+, .TLR(TLR)
+
+
+, .UPDATEDR(UPDATEDR)
+, .BSR(BSR)
+
+, .RUNBIST_SELECT(RUNBIST_SELECT)
+, .BIST_IN(CORE_LOGIC)
+, .BIST_OUT(bist_data_out)
+, .BIST_DATA(BIST_DATA)
+, .RESET_SM(RESET_SM)
+, .error(error)
+, .ASSIGN_STATE(ASSIGN_STATE)
 );
 
 always @(posedge TCK) begin
@@ -190,6 +236,9 @@ localparam SAMPLE   = 4'h1;
 localparam EXTEST   = 4'h2;
 localparam INTEST   = 4'h3;
 localparam USERCODE = 4'h8;
+localparam RUNBIST  = 4'h4;
+
+assign CL_INPUT = RUNBIST_SELECT ? bist_data_out : INTEST_CL;
 
 always @(posedge TCK) begin
     if ( SHIFTDR ) begin
@@ -200,6 +249,7 @@ always @(posedge TCK) begin
 				EXTEST:     begin TDO <= BSR_TDO;          end
 				INTEST:     begin TDO <= BSR_TDO;          end
 				USERCODE:   begin TDO <= BSR_TDO;          end
+				RUNBIST:    begin TDO <= BSR_TDO;          end
             	default:    begin TDO <= ID_REG_TDO;       end
         endcase  
     end else

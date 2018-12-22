@@ -16,11 +16,13 @@ module dr
 ,   input            EXTEST_SELECT
 ,   input            INTEST_SELECT
 ,   input            USERCODE_SELECT
+,   input            RUNBIST_SELECT
 
 ,   input      [3:0] EXTEST_IO
 ,   input      [3:0] INTEST_CL
 
 ,   input      [3:0] CORE_LOGIC
+,   input      [7:0] BIST_LOG
 
 ,   output reg [9:0] BSR
 
@@ -70,7 +72,15 @@ always @(posedge TCK) begin
 		 if ( UPDATEDR ) begin
 			USERCODE_REG <= BSR[9:2];
 		 end
-	 end
+	 end else
+	 if ( RUNBIST_SELECT ) begin
+        if( CAPTUREDR ) begin
+            BSR <= { BIST_LOG, LSB }; ///////////// LSB ???????? 
+        end else
+        if ( SHIFTDR ) begin
+            BSR <= { TDI, BSR[9:1] };
+         end
+     end    
 end
 
 always @(negedge TCK) BSR_TDO      <= BSR[0];

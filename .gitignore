@@ -12,3 +12,12 @@ a.out
 *.prof
 hdl/gen/*
 .vscode/*
+*.bak
+*.rpt
+*.done
+*.smsg
+*.summary
+*.jdi
+*.sld
+*.vcd
+*.qws

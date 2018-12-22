@@ -118,7 +118,7 @@ always @(negedge TCK) begin
     SHIFTDR        <= 1'b0;
     CAPTUREIR      <= 1'b0;
     CAPTUREDR      <= 1'b0;
-	 TLR            <= 1'b0;
+	TLR            <= 1'b0;
 
     case(state)
         STATE_UPDATE_IR:        begin UPDATEIR        <= 1'b1; end
