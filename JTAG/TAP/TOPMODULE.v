@@ -27,11 +27,12 @@ The $clog2 system task was added to the SystemVerilog extension to Verilog (IEEE
 This returns an integer which has the value of the ceiling of the log base 2. 
 The DEPTH need not be a power of 2.
 */
-    parameter DEPTH = 6;
+    parameter DEPTH = 112;
     parameter WIDTH = $clog2(DEPTH);
 )
 (
     input            TMS       // J20: V14
+,   input            clk       // J20: V15	
 ,   input            TCK       // J20: V15
 ,   input            TDI       // J20: W16
 ,   output reg       TDO       // J20: V16
@@ -100,6 +101,7 @@ wire       EXTEST_SELECT;
 wire       INTEST_SELECT;
 wire	   USERCODE_SELECT;
 wire       RUNBIST_SELECT;
+wire 	   GETTEST_SELECT
 
 //
 wire [9:0] BSR;
@@ -150,6 +152,9 @@ state_decoder state_decoder_sample
 , .SAMPLE_SELECT(SAMPLE_SELECT)
 , .INTEST_SELECT(INTEST_SELECT)
 , .USERCODE_SELECT(USERCODE_SELECT)
+, .RUNBIST_SELECT(RUNBIST_SELECT)
+, .GETTEST_SELECT(GETTEST_SELECT)
+, .SETSTATE_SELECT(SETSTATE_SELECT)
 );
 
 dr test_data_register
@@ -174,6 +179,8 @@ dr test_data_register
 , .UR_OUT(UR_OUT)
 , .BIST_LOG(BIST_LOG)
 , .RUNBIST_SELECT(RUNBIST_SELECT)
+, .GETTEST_SELECT(GETTEST_SELECT)
+, .SETSTATE_SELECT(SETSTATE_SELECT)
 );
 
 bypass bypass_tar
@@ -203,12 +210,11 @@ BIST #(.DEPTH(DEPTH), .WIDTH(WIDTH)) BIST_INST
   .TCK(TCK)
 , .clk(clk)
 , .TLR(TLR)
-
-
 , .UPDATEDR(UPDATEDR)
 , .BSR(BSR)
-
 , .RUNBIST_SELECT(RUNBIST_SELECT)
+, .GETTEST_SELECT(GETTEST_SELECT)
+, .SETSTATE_SELECT(SETSTATE_SELECT)
 , .BIST_IN(CORE_LOGIC)
 , .BIST_OUT(bist_data_out)
 , .BIST_DATA(BIST_DATA)

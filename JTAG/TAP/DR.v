@@ -17,6 +17,8 @@ module dr
 ,   input            INTEST_SELECT
 ,   input            USERCODE_SELECT
 ,   input            RUNBIST_SELECT
+,   input            GETTEST_SELECT
+,	input			 SETSTATE_SELECT
 
 ,   input      [3:0] EXTEST_IO
 ,   input      [3:0] INTEST_CL
@@ -81,7 +83,18 @@ always @(posedge TCK) begin
             BSR <= { TDI, BSR[9:1] };
          end
      end    
+	 if ( GETTEST_SELECT ) begin
+        if ( SHIFTDR ) begin
+            BSR <= { TDI, BSR[9:1] };
+        end
+    end
+	 if ( SETSTATE_SELECT ) begin
+        if ( SHIFTDR ) begin
+            BSR <= { TDI, BSR[9:1] };
+        end
+    end
 end
+
 
 always @(negedge TCK) BSR_TDO      <= BSR[0];
 always @(negedge TCK) ID_REG_TDO   <= ID_REG_COPY[0];
