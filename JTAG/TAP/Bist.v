@@ -88,9 +88,33 @@ always @(posedge TCK)
                 end else counter <= 0;        
     end
 
+reg [WIDTH-1:0] pc;
+wire stop_command 
+assign stop_command  = pc == temp; // signal stop for RESET_SM
 
+always @(posedge clk) begin
+    if (TLR | stop_command) pc <= 0;
+    else if (RUNBIST_SELECT && && !RESET_SM) pc <= pc + 1;
+end
 
+always @(posedge clk) 
+    begin
+        if(TLR) error <= 0;
+        else if(pc & !SETSTATE_SELECT) 
+                begin
+                    error <= BIST_IN != bist_check[pc-1];
+                end
+    end
 
+always @(posedge clk) 
+    begin
+        if (TLR | !RUNBIST_SELECT) RESET_SM <= 0;
+        else if (stop_command)     RESET_SM <= 1;
+    end
 
+assign BIST_OUT  = RUNBIST_SELECT ? bist_config[pc] : 4'b1001;
+assign BIST_DATA = RESET_SM & !error ? 8'hFF : pc - 1;
+
+endmodule
 
 
