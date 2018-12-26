@@ -7,8 +7,9 @@ module core_logic
 ,   input  [3:0]    X
 ,   input           RUNBIST_SELECT
 ,   input           INTEST_SELECT
+,   input           SETSTATE_SELECT
 ,   input           TUMBLERS
-,   input           ASSIGN_STATE
+,   input  [3:0]    ASSIGN_STATE
 ,   output [3:0]    Y
 );
 
@@ -22,10 +23,10 @@ always @ (posedge clock) begin
 		state <= 4'b0000;
 	else
 		begin
-			if (RUNBIST_SELECT | INTEST_SELECT)
+			if (RUNBIST_SELECT | INTEST_SELECT | SETSTATE_SELECT)
 				begin
-                    if (ASSIGN_STATE)
-                        state <= X;
+                    if (SETSTATE_SELECT)
+                        state <= ASSIGN_STATE;
                     else 
                         begin                    	
                             case(state)
@@ -213,7 +214,7 @@ always @ (posedge clock) begin
                         end
                 end
         end
-
+end
 //   ^   ^   ^   ^   |   |   |   |
 //   |   |   |   |   v   v   v   v
 //  -------------------------------

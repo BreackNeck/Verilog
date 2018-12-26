@@ -27,8 +27,8 @@ The $clog2 system task was added to the SystemVerilog extension to Verilog (IEEE
 This returns an integer which has the value of the ceiling of the log base 2. 
 The DEPTH need not be a power of 2.
 */
-    parameter DEPTH = 112;
-    parameter WIDTH = $clog2(DEPTH);
+    parameter DEPTH = 256
+    //parameter WIDTH = $clog2(DEPTH)
 )
 (
     input            TMS       // J20: V14
@@ -101,19 +101,21 @@ wire       EXTEST_SELECT;
 wire       INTEST_SELECT;
 wire	   USERCODE_SELECT;
 wire       RUNBIST_SELECT;
-wire 	   GETTEST_SELECT
+wire 	   GETTEST_SELECT;
+wire 	   SETSTATE_SELECT;
 
 //
 wire [9:0] BSR;
 wire [3:0] CORE_LOGIC;
 wire [7:0] UR_OUT;
 wire [7:0] IR_REG_OUT;
-wire [7:0] BIST_LOG;
 
 wire       RESET_SM;
 wire       error;
 wire [3:0] CL_INPUT;
-wire       ASSIGN_STATE;
+wire [3:0] ASSIGN_STATE;
+wire [7:0] BIST_DATA;
+
 tap_controller test_access_port
 ( 
   .TMS(TMS)
@@ -177,7 +179,7 @@ dr test_data_register
 , .EXTEST_IO(EXTEST_IO)
 , .INTEST_CL(INTEST_CL)
 , .UR_OUT(UR_OUT)
-, .BIST_LOG(BIST_LOG)
+, .BIST_DATA(BIST_DATA)
 , .RUNBIST_SELECT(RUNBIST_SELECT)
 , .GETTEST_SELECT(GETTEST_SELECT)
 , .SETSTATE_SELECT(SETSTATE_SELECT)
@@ -202,10 +204,13 @@ core_logic core_logic_inst
 , .ASSIGN_STATE(ASSIGN_STATE)
 , .RUNBIST_SELECT(RUNBIST_SELECT)
 , .INTEST_SELECT(INTEST_SELECT)
-, .TUMBLERS(ASSIGN_STATE)
+, .SETSTATE_SELECT(SETSTATE_SELECT)
+, .TUMBLERS(1'b0)
 );
 
-BIST #(.DEPTH(DEPTH), .WIDTH(WIDTH)) BIST_INST
+wire [3:0] bist_data_out;
+
+Bist #(.DEPTH(DEPTH)) BIST_INST
 (
   .TCK(TCK)
 , .clk(clk)
@@ -273,5 +278,17 @@ assign LEDs[4] = INTEST_SELECT ? CORE_LOGIC[0] : SAMPLE_SELECT ? INTEST_CL[0] : 
 assign LEDs[5] = INTEST_SELECT ? CORE_LOGIC[1] : SAMPLE_SELECT ? INTEST_CL[1] : EXTEST_IO[1];
 assign LEDs[6] = INTEST_SELECT ? CORE_LOGIC[2] : SAMPLE_SELECT ? INTEST_CL[2] : EXTEST_IO[2];
 assign LEDs[7] = INTEST_SELECT ? CORE_LOGIC[3] : SAMPLE_SELECT ? INTEST_CL[3] : EXTEST_IO[3];
+
+// always @(posedge TCK) begin
+//     case(LATCH_JTAG_IR)
+//     IDCODE:     begin LEDs <= IR_REG_OUT;                                        end
+//     SAMPLE:     begin LEDs <= { EXTEST_IO, INTEST_CL  };                         end
+//     EXTEST:     begin LEDs <= { EXTEST_IO, TUMBLERS   };                         end
+//     INTEST:     begin LEDs <= { CORE_LOGIC, INTEST_CL };                         end
+//     USERCODE:   begin LEDs <= UR_OUT;                                            end
+//     RUNBIST:    begin LEDs <= TUMBLERS[0] ? BIST_LOG : { 6'b000000, err, stop }; end
+//     default:    begin LEDs <= { EXTEST_IO, INTEST_CL  };                         end
+//     endcase
+// end
 
 endmodule

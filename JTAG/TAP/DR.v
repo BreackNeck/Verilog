@@ -24,7 +24,7 @@ module dr
 ,   input      [3:0] INTEST_CL
 
 ,   input      [3:0] CORE_LOGIC
-,   input      [7:0] BIST_LOG
+,   input      [7:0] BIST_DATA
 
 ,   output reg [9:0] BSR
 
@@ -77,7 +77,7 @@ always @(posedge TCK) begin
 	 end else
 	 if ( RUNBIST_SELECT ) begin
         if( CAPTUREDR ) begin
-            BSR <= { BIST_LOG, LSB }; ///////////// LSB ???????? 
+            BSR <= { BIST_DATA, LSB }; ///////////// LSB ???????? 
         end else
         if ( SHIFTDR ) begin
             BSR <= { TDI, BSR[9:1] };

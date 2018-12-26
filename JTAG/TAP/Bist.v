@@ -1,4 +1,4 @@
-module BIST
+module Bist
 #(
 /*
 relation RAM DEPTH = 2 ^ (ADDRESS WIDTH)
@@ -7,7 +7,7 @@ The $clog2 system task was added to the SystemVerilog extension to Verilog (IEEE
 This returns an integer which has the value of the ceiling of the log base 2. 
 The DEPTH need not be a power of 2.
 */
-    parameter DEPTH = 6;
+    parameter DEPTH = 256
     //parameter WIDTH = $clog2(DEPTH);
 )
 (
@@ -24,7 +24,7 @@ The DEPTH need not be a power of 2.
 ,   output     [7:0] BIST_DATA
 ,   input            UPDATEDR
 ,   input      [9:0] BSR
-,   output           ASSIGN_STATE
+,   output     [3:0] ASSIGN_STATE
 );
 
 wire [3:0] config_bsr;
@@ -40,11 +40,8 @@ reg [3:0] assign_state;
 
 always @(posedge TCK) 
     begin
-         if (TLR) assign_state <= 4'b0000;                   
-         else if (SETSTATE_SELECT) 
-                begin
-                     if (UPDATEDR) assign_state <= state_number;                   
-                end
+         if (TLR)                             assign_state <= 4'b0000;                   
+         else if (SETSTATE_SELECT & UPDATEDR) assign_state <= state_number;                   
     end
 
 assign  ASSIGN_STATE = assign_state;
@@ -61,10 +58,10 @@ endfunction
 localparam WIDTH = clog2(DEPTH);
 
 reg [3:0] bist_config[0:DEPTH-1];
-initial $readmemb("config-state-0.io", bist_config, 0, DEPTH-1); // Initial Regestry file (memory) (("<file_name>", <memory_name>, memory_start, memory_finish");)
+initial $readmemb("bistconfig.io", bist_config, 0, DEPTH-1); // Initial Regestry file (memory) (("<file_name>", <memory_name>, memory_start, memory_finish");)
 
-reg [3:0] bist_check[0:MEMORY_SIZE-1];
-initial $readmemb("check.io", bist_check, 0, DEPTH-1); // Check transition result
+reg [3:0] bist_check[0:DEPTH-1];
+initial $readmemb("bistcheck.io", bist_check, 0, DEPTH-1); // Check transition result
 
 reg [WIDTH-1:0] counter;
 reg [WIDTH-1:0] temp;
@@ -89,21 +86,18 @@ always @(posedge TCK)
     end
 
 reg [WIDTH-1:0] pc;
-wire stop_command 
+wire stop_command;
 assign stop_command  = pc == temp; // signal stop for RESET_SM
 
 always @(posedge clk) begin
     if (TLR | stop_command) pc <= 0;
-    else if (RUNBIST_SELECT && && !RESET_SM) pc <= pc + 1;
+    else if (RUNBIST_SELECT && !RESET_SM) pc <= pc + 1;
 end
 
 always @(posedge clk) 
     begin
         if(TLR) error <= 0;
-        else if(pc & !SETSTATE_SELECT) 
-                begin
-                    error <= BIST_IN != bist_check[pc-1];
-                end
+        else if(pc) error <= BIST_IN != bist_check[pc-1];
     end
 
 always @(posedge clk) 
