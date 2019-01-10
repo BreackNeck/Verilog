@@ -1,7 +1,6 @@
 module core_logic
 (
-    input           TCK
-,   input           clk    
+    input           clk    
 ,   input           TLR
 ,   input           RESET_SM
 ,   input  [3:0]    X
@@ -13,12 +12,12 @@ module core_logic
 ,   output [3:0]    Y
 );
 
-wire clock = RUNBIST_SELECT ? clk : TCK;
-assign Y = state;
+//wire clock = RUNBIST_SELECT ? clk : TCK;
 
 reg [3:0] state;
+assign Y = state;
 
-always @ (posedge clock) begin
+always @ (posedge clk) begin
 	if (TLR | RESET_SM)
 		state <= 4'b0000;
 	else
@@ -31,11 +30,11 @@ always @ (posedge clock) begin
                         begin                    	
                             case(state)
                                 4'b0000 : begin
-                                                if((X & 4'b1110) == 4'b0000)
+                                                if((X == 4'b0000) | (X == 4'b0001))
                                                     state <= 4'b0010;
                                                 else if(X == 4'b1000)
                                                     state <= 4'b0110;
-                                                else if((X & 4'b1011) == 4'b1001)
+                                                else if((X  == 4'b1001) | (X == 4'b1101))
                                                     state <= 4'b1010;
                                                 else if(X == 4'b1111)
                                                     state <= 4'b1101;					 
@@ -59,7 +58,7 @@ always @ (posedge clock) begin
                                                     state <= 4'b0101;
                                                 else if(X == 4'b0110)
                                                     state <= 4'b0111;
-                                                else if((X & 4'b1101) == 4'b0000)
+                                                else if((X == 4'b0000) | (X == 4'b0010))
                                                     state <= 4'b1001;						
                                                 else if(X == 4'b1100)
                                                     state <= 4'b1110;					 

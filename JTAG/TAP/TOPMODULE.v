@@ -50,7 +50,7 @@ The DEPTH need not be a power of 2.
                                // ��������� LA: 256 | 50 | 1 | 1
 										 // ��������� A1 Triger �� �������� �����
 										 
-,   output     [7:0] LEDs      // LEDs[7] : W21 : LED7
+,   output reg [7:0] LEDs      // LEDs[7] : W21 : LED7
 										 // LEDs[6] : Y22 : LED6
 										 // LEDs[5] : V20 : LED5
 										 // LEDs[4] : V19 : LED4
@@ -115,6 +115,9 @@ wire       error;
 wire [3:0] CL_INPUT;
 wire [3:0] ASSIGN_STATE;
 wire [7:0] BIST_DATA;
+wire [3:0] bist_data_out;
+
+wire clock = RUNBIST_SELECT ? clk : TCK;
 
 tap_controller test_access_port
 ( 
@@ -129,7 +132,6 @@ tap_controller test_access_port
 , .CAPTUREDR(CAPTUREDR)
 , .SHIFTDR(SHIFTDR)
 , .UPDATEDR(UPDATEDR)
-
 , .TLR(TLR)
 );
 
@@ -195,8 +197,8 @@ bypass bypass_tar
 
 core_logic core_logic_inst
 (
-  .TCK(TCK)
-, .clk(clk) 
+  
+  .clk(clock) 
 , .TLR(TLR) 
 , .RESET_SM(RESET_SM)
 , .X(CL_INPUT)
@@ -207,8 +209,6 @@ core_logic core_logic_inst
 , .SETSTATE_SELECT(SETSTATE_SELECT)
 , .TUMBLERS(1'b0)
 );
-
-wire [3:0] bist_data_out;
 
 Bist #(.DEPTH(DEPTH)) BIST_INST
 (
@@ -231,7 +231,7 @@ Bist #(.DEPTH(DEPTH)) BIST_INST
 always @(posedge TCK) begin
     if( UPDATEDR & SAMPLE_SELECT ) begin
 		EXTEST_IO <= BSR[9:6];		
-	   INTEST_CL <= BSR[5:2];
+	    INTEST_CL <= BSR[5:2];
 	 end else 
 	 if( UPDATEDR & EXTEST_SELECT ) begin
 		EXTEST_IO <= BSR[9:6];
@@ -249,7 +249,22 @@ localparam INTEST   = 4'h3;
 localparam USERCODE = 4'h8;
 localparam RUNBIST  = 4'h4;
 
-assign CL_INPUT = RUNBIST_SELECT ? bist_data_out : INTEST_CL;
+assign CL_INPUT = RUNBIST_SELECT | !SETSTATE_SELECT | !GETTEST_SELECT ? bist_data_out : INTEST_CL;
+
+//reg [3:0] cl_temp;
+
+// always @(posedge TCK) 
+// begin
+// 	 if ( RUNBIST_SELECT ) begin
+// 	     cl_temp <=  bist_data_out;
+// 	 end else begin 
+// 	 	 if ( SETSTATE_SELECT ) begin
+// 		 cl_temp <=  INTEST_CL;
+// 		 end
+// 	 end
+// end
+
+//assign CL_INPUT = cl_temp; 
 
 always @(posedge TCK) begin
     if ( SHIFTDR ) begin
@@ -269,26 +284,26 @@ always @(posedge TCK) begin
     end
 end
 
-assign LEDs[0] = INTEST_SELECT ? INTEST_CL[0] : SAMPLE_SELECT ? EXTEST_IO[0] : TUMBLERS[0];
-assign LEDs[1] = INTEST_SELECT ? INTEST_CL[1] : SAMPLE_SELECT ? EXTEST_IO[1] : TUMBLERS[1];
-assign LEDs[2] = INTEST_SELECT ? INTEST_CL[2] : SAMPLE_SELECT ? EXTEST_IO[2] : TUMBLERS[2];
-assign LEDs[3] = INTEST_SELECT ? INTEST_CL[3] : SAMPLE_SELECT ? EXTEST_IO[3] : TUMBLERS[3];
+// assign LEDs[0] = INTEST_SELECT ? INTEST_CL[0] : SAMPLE_SELECT ? EXTEST_IO[0] : TUMBLERS[0];
+// assign LEDs[1] = INTEST_SELECT ? INTEST_CL[1] : SAMPLE_SELECT ? EXTEST_IO[1] : TUMBLERS[1];
+// assign LEDs[2] = INTEST_SELECT ? INTEST_CL[2] : SAMPLE_SELECT ? EXTEST_IO[2] : TUMBLERS[2];
+// assign LEDs[3] = INTEST_SELECT ? INTEST_CL[3] : SAMPLE_SELECT ? EXTEST_IO[3] : TUMBLERS[3];
 
-assign LEDs[4] = INTEST_SELECT ? CORE_LOGIC[0] : SAMPLE_SELECT ? INTEST_CL[0] : EXTEST_IO[0];
-assign LEDs[5] = INTEST_SELECT ? CORE_LOGIC[1] : SAMPLE_SELECT ? INTEST_CL[1] : EXTEST_IO[1];
-assign LEDs[6] = INTEST_SELECT ? CORE_LOGIC[2] : SAMPLE_SELECT ? INTEST_CL[2] : EXTEST_IO[2];
-assign LEDs[7] = INTEST_SELECT ? CORE_LOGIC[3] : SAMPLE_SELECT ? INTEST_CL[3] : EXTEST_IO[3];
+// assign LEDs[4] = INTEST_SELECT ? CORE_LOGIC[0] : SAMPLE_SELECT ? INTEST_CL[0] : EXTEST_IO[0];
+// assign LEDs[5] = INTEST_SELECT ? CORE_LOGIC[1] : SAMPLE_SELECT ? INTEST_CL[1] : EXTEST_IO[1];
+// assign LEDs[6] = INTEST_SELECT ? CORE_LOGIC[2] : SAMPLE_SELECT ? INTEST_CL[2] : EXTEST_IO[2];
+// assign LEDs[7] = INTEST_SELECT ? CORE_LOGIC[3] : SAMPLE_SELECT ? INTEST_CL[3] : EXTEST_IO[3];
 
-// always @(posedge TCK) begin
-//     case(LATCH_JTAG_IR)
-//     IDCODE:     begin LEDs <= IR_REG_OUT;                                        end
-//     SAMPLE:     begin LEDs <= { EXTEST_IO, INTEST_CL  };                         end
-//     EXTEST:     begin LEDs <= { EXTEST_IO, TUMBLERS   };                         end
-//     INTEST:     begin LEDs <= { CORE_LOGIC, INTEST_CL };                         end
-//     USERCODE:   begin LEDs <= UR_OUT;                                            end
-//     RUNBIST:    begin LEDs <= TUMBLERS[0] ? BIST_LOG : { 6'b000000, err, stop }; end
-//     default:    begin LEDs <= { EXTEST_IO, INTEST_CL  };                         end
-//     endcase
-// end
+always @(posedge TCK) begin
+    case(LATCH_JTAG_IR)
+    IDCODE:     begin LEDs <= IR_REG_OUT;                                               end
+    SAMPLE:     begin LEDs <= { EXTEST_IO, INTEST_CL  };                                end
+    EXTEST:     begin LEDs <= { EXTEST_IO, TUMBLERS   };                                end
+    INTEST:     begin LEDs <= { CORE_LOGIC, INTEST_CL };                                end
+    USERCODE:   begin LEDs <= UR_OUT;                                                   end
+    RUNBIST:    begin LEDs <= TUMBLERS[0] ? BIST_DATA : { 6'b000000, error, RESET_SM }; end
+    default:    begin LEDs <= { EXTEST_IO, INTEST_CL  };                                end
+    endcase
+end
 
 endmodule

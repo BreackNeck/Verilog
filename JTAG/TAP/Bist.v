@@ -87,11 +87,12 @@ always @(posedge TCK)
 
 reg [WIDTH-1:0] pc;
 wire stop_command;
+reg cycle;
 assign stop_command  = pc == temp; // signal stop for RESET_SM
 
 always @(posedge clk) begin
     if (TLR | stop_command) pc <= 0;
-    else if (RUNBIST_SELECT && !RESET_SM) pc <= pc + 1;
+    else if (RUNBIST_SELECT && !RESET_SM && !cycle) pc <= pc + 1;
 end
 
 always @(posedge clk) 
@@ -99,6 +100,11 @@ always @(posedge clk)
         if(TLR) error <= 0;
         else if(pc) error <= BIST_IN != bist_check[pc-1];
     end
+
+always @(posedge clk) begin
+    if (TLR)                                                         cycle <= 0;
+    else if (BIST_IN != bist_check[pc-1] & SETSTATE_SELECT)          cycle <= 1;
+end
 
 always @(posedge clk) 
     begin

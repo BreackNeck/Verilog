@@ -44,7 +44,7 @@ always @(LATCH_JTAG_IR) begin
 		  USERCODE:   begin USERCODE_SELECT   <= 1'b1; end
 		  GETTEST:    begin GETTEST_SELECT    <= 1'b1; end
 		  RUNBIST:    begin RUNBIST_SELECT    <= 1'b1; end
-		  	:   begin SETSTATE_SELECT   <= 1'b1; end
+		  SETSTATE:   begin SETSTATE_SELECT   <= 1'b1; end
           default:    begin IDCODE_SELECT     <= 1'b1; end
     endcase
 end

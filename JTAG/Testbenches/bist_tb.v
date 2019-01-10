@@ -141,28 +141,31 @@ initial begin
 
   command(GETTEST); 
 
-   data(8'b00000010);
-   data(8'b10110001);
-   data(8'b11110000);
-   data(8'b00010010);
-   data(8'b11110101);
+    data(8'b00000010); //02
+    data(8'b10110001); //b1
+    data(8'b11110000); //F0
+    data(8'b00010010); //12
+    data(8'b11110101); //F5
 
-  command(RUNBIST); 
-///////////////////////////////////////
-  command(SETSTATE);
-   data(8'b00000000);
-  
-  command(GETTEST);
+    command(RUNBIST); 
+  ///////////////////////////////////////
+    command(SETSTATE);
+    data(8'b00000000); //00
+    
+    command(GETTEST);
 
-   data(8'b10011010);
-   data(8'b00110010);
-   data(8'b01100111);
-   data(8'b00000000);
-   data(8'b11111101);
-   data(8'b00100000);
+    data(8'b10011010); //9A
+    data(8'b00110010); //32
+    data(8'b01100111); //67
+    data(8'b00000000); //00
+    data(8'b11111101); //FD
+    data(8'b00100000); //20
 
-  command(RUNBIST);
-  /////////////////////////////////////
+    command(RUNBIST);
+    /////////////////////////////////////   
+
+
+
   //   data(SET_STATE);
   //   data(8'b00000000);
 
@@ -186,7 +189,23 @@ initial begin
   // data(8'b10100001);
   // data(8'b01000000);
 
-   
+  //command(BYPASS); data(8'b10000001);
+  //command(SAMPLE); data(8'b10100101);
+  //command(EXTEST); data(8'b01101111);
+  
+  // command(INTEST); data(8'b10101001);
+  // command(INTEST); data(8'b10101001);
+  // command(INTEST); data(8'b00100011);
+  // command(INTEST); data(8'b01110110);
+  // command(INTEST); data(8'b00000000);
+  // command(INTEST); data(8'b11011111);
+  // command(INTEST); data(8'b00000010);
+
+  ///////////////////////////////////// 5210 - 1270 = 3940 ns; 
+  ///////////////////////////////////// 1 ???? - 10 ns; ????? ???????????? ? ??????? ??????? - 394 ????? (3940 ns);
+  ///////////////////////////////////// 1 ???? - 10 ns; ????? ???????????? ? ??????? BIST - 4 ????? (40 ns)
+
+  //command(BYPASS); data(8'b10000001);
 
   //repeat(1000) @(posedge clk); info();
   repeat(100) @(posedge clk); $finish;
