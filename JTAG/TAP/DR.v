@@ -77,7 +77,7 @@ always @(posedge TCK) begin
 	 end else
 	 if ( RUNBIST_SELECT ) begin
         if( CAPTUREDR ) begin
-            BSR <= { BIST_DATA, LSB }; ///////////// LSB ???????? 
+            BSR <= { BIST_DATA, LSB }; 
         end else
         if ( SHIFTDR ) begin
             BSR <= { TDI, BSR[9:1] };

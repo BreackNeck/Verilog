@@ -76,13 +76,14 @@ assign TDI_LA = TDI;
 assign TDO_LA = TDO;
 
 // ������� � �������� ����������
-wire       CAPTUREIR;
-wire       SHIFTIR;
-wire       UPDATEIR;
-wire       CAPTUREDR;
-wire       SHIFTDR;
-wire       UPDATEDR;
-wire       TLR;
+wire		CAPTUREIR;
+wire		SHIFTIR;
+wire		UPDATEIR;
+wire		CAPTUREDR;
+wire		SHIFTDR;
+wire		UPDATEDR;
+wire		TLR;
+//wire		enable;
 
 // ������� ��� ������
 wire [3:0] LATCH_JTAG_IR;
@@ -115,7 +116,8 @@ wire       error;
 wire [3:0] CL_INPUT;
 wire [3:0] ASSIGN_STATE;
 wire [7:0] BIST_DATA;
-wire [3:0] bist_data_out;
+wire [3:0] BIST_OUT;
+//wire [3:0] bist_data_out;
 
 wire clock = RUNBIST_SELECT ? clk : TCK;
 
@@ -197,17 +199,11 @@ bypass bypass_tar
 
 core_logic core_logic_inst
 (
-  
   .clk(clock) 
-, .TLR(TLR) 
-, .RESET_SM(RESET_SM)
 , .X(CL_INPUT)
 , .Y(CORE_LOGIC)
 , .ASSIGN_STATE(ASSIGN_STATE)
-, .RUNBIST_SELECT(RUNBIST_SELECT)
-, .INTEST_SELECT(INTEST_SELECT)
-, .SETSTATE_SELECT(SETSTATE_SELECT)
-, .TUMBLERS(1'b0)
+, .enable(enable)
 );
 
 Bist #(.DEPTH(DEPTH)) BIST_INST
@@ -221,7 +217,7 @@ Bist #(.DEPTH(DEPTH)) BIST_INST
 , .GETTEST_SELECT(GETTEST_SELECT)
 , .SETSTATE_SELECT(SETSTATE_SELECT)
 , .BIST_IN(CORE_LOGIC)
-, .BIST_OUT(bist_data_out)
+, .BIST_OUT(BIST_OUT)
 , .BIST_DATA(BIST_DATA)
 , .RESET_SM(RESET_SM)
 , .error(error)
@@ -249,7 +245,8 @@ localparam INTEST   = 4'h3;
 localparam USERCODE = 4'h8;
 localparam RUNBIST  = 4'h4;
 
-assign CL_INPUT = RUNBIST_SELECT | !SETSTATE_SELECT | !GETTEST_SELECT ? bist_data_out : INTEST_CL;
+assign CL_INPUT = RUNBIST_SELECT | !SETSTATE_SELECT | !GETTEST_SELECT ? BIST_OUT : INTEST_CL;
+assign enable   = (RUNBIST_SELECT |  INTEST_SELECT   | SETSTATE_SELECT) & (!TLR & !RESET_SM) ? 1'b1 : 1'b0; 
 
 //reg [3:0] cl_temp;
 

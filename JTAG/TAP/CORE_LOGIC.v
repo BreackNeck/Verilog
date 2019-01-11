@@ -1,13 +1,10 @@
 module core_logic
 (
     input           clk    
-,   input           TLR
-,   input           RESET_SM
 ,   input  [3:0]    X
-,   input           RUNBIST_SELECT
-,   input           INTEST_SELECT
+,   input           enable
+///////////////////////////////////
 ,   input           SETSTATE_SELECT
-,   input           TUMBLERS
 ,   input  [3:0]    ASSIGN_STATE
 ,   output [3:0]    Y
 );
@@ -18,11 +15,11 @@ reg [3:0] state;
 assign Y = state;
 
 always @ (posedge clk) begin
-	if (TLR | RESET_SM)
+	if ( !enable )
 		state <= 4'b0000;
 	else
 		begin
-			if (RUNBIST_SELECT | INTEST_SELECT | SETSTATE_SELECT)
+			if (enable)
 				begin
                     if (SETSTATE_SELECT)
                         state <= ASSIGN_STATE;
