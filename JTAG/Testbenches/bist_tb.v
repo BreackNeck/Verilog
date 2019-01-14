@@ -20,7 +20,6 @@ localparam INTEST     = 4'h3;
 localparam USERCODE   = 4'h8;
 localparam RUNBIST 		= 4'h4;
 localparam GETTEST		= 4'h5;
-localparam SETSTATE		= 4'h6;
 
 
 TOPMODULE 
@@ -35,7 +34,7 @@ TOPMODULE
 , .TDO(TDO)
 );
 
-reg  [3:0] X;
+reg  [4:0] X;
 wire [3:0] Y;
 
 always begin
@@ -74,15 +73,15 @@ task command;
 endtask
 
 task data;
-  input [7:0] data;
+  input [9:0] data;
   begin
     TMS = 1; @(negedge TCK); // Select_DR_Scan <- 7
     TMS = 0; @(negedge TCK); // Capture_DR <- 7
     TMS = 0; @(negedge TCK); // Shidt_DR <- 2
 
-      // For LBS
-      TDI = 0; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
-      TDI = 0; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      //For LBS
+      // TDI = 0; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      // TDI = 0; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
 
       TDI = data[0]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
       TDI = data[1]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
@@ -92,7 +91,9 @@ task data;
       TDI = data[4]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
       TDI = data[5]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
       TDI = data[6]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
-      TDI = data[7]; TMS = 1; @(negedge TCK); // EXIT1_DR <- 2
+      TDI = data[7]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[8]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[9]; TMS = 1; @(negedge TCK); // EXIT1_DR <- 2
 
       TDI = 0; TMS = 0; @(negedge TCK); // PAUSE_DR <- 3
       TDI = 0; TMS = 0; @(negedge TCK); // PAUSE_DR <- 3
@@ -139,29 +140,27 @@ initial begin
 
   //display_buffers(); $display("++++++++++++++++++++++++++++++++++++++++");
 
-  command(GETTEST); 
+    command(GETTEST); 
 
-    data(8'b00000010); //02
-    data(8'b10110001); //b1
-    data(8'b11110000); //F0
-    data(8'b00010010); //12
-    data(8'b11110101); //F5
+    data(10'b0000000100); //02
+    data(10'b1011000010); //b1
+    data(10'b1111000000); //F0
+    data(10'b0001000100); //12
+    data(10'b1111001010); //F5
 
     command(RUNBIST); 
-  ///////////////////////////////////////
-    command(SETSTATE);
-    data(8'b00000000); //00
-    
-    command(GETTEST);
+  // // ///////////////////////////////////////
+   
+  //   command(GETTEST);
 
-    data(8'b10011010); //9A
-    data(8'b00110010); //32
-    data(8'b01100111); //67
-    data(8'b00000000); //00
-    data(8'b11111101); //FD
-    data(8'b00100000); //20
+  //   data(10'b1001010100); //9A
+  //   data(10'b0011000100); //32
+  //   data(10'b0110001110); //67
+  //   data(10'b0000000000); //00
+  //   data(10'b1111011010); //FD
+  //   data(10'b0010000000); //20
 
-    command(RUNBIST);
+    // command(RUNBIST);
     /////////////////////////////////////   
 
 

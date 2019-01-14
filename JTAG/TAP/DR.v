@@ -18,21 +18,20 @@ module dr
 ,   input            USERCODE_SELECT
 ,   input            RUNBIST_SELECT
 ,   input            GETTEST_SELECT
-,	input			 SETSTATE_SELECT
 
-,   input      [3:0] EXTEST_IO
-,   input      [3:0] INTEST_CL
-
-,   input      [3:0] CORE_LOGIC
-,   input      [7:0] BIST_DATA
-
-,   output reg [9:0] BSR
-
-,   input      [3:0] TUMBLERS
-,   output     [7:0] UR_OUT
+,   input       [3:0] EXTEST_IO
+,   input       [3:0] INTEST_CL
+ 
+,   input       [3:0] CORE_LOGIC
+,   input       [15:0] BIST_DATA
+ 
+,   output reg  [9:0] BSR
+, 	output reg [15:0] STATUS_BIST_REG
+,   input       [3:0] TUMBLERS
+,   output      [7:0] UR_OUT
 );
 
-localparam LSB = 2'b01;
+localparam LSB        = 2'b01;
 
 localparam PRELOAD_DATA = 8'h81;
 reg [7:0] ID_REG = 8'hA1;
@@ -77,18 +76,13 @@ always @(posedge TCK) begin
 	 end else
 	 if ( RUNBIST_SELECT ) begin
         if( CAPTUREDR ) begin
-            BSR <= { BIST_DATA, LSB }; 
+            STATUS_BIST_REG <= { BIST_DATA }; 
         end else
         if ( SHIFTDR ) begin
-            BSR <= { TDI, BSR[9:1] };
+            STATUS_BIST_REG <= { TDI, STATUS_BIST_REG[15:1] };
          end
      end    
 	 if ( GETTEST_SELECT ) begin
-        if ( SHIFTDR ) begin
-            BSR <= { TDI, BSR[9:1] };
-        end
-    end
-	 if ( SETSTATE_SELECT ) begin
         if ( SHIFTDR ) begin
             BSR <= { TDI, BSR[9:1] };
         end

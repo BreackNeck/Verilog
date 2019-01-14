@@ -69,6 +69,9 @@ The DEPTH need not be a power of 2.
 reg [3:0] EXTEST_IO;
 reg [3:0] INTEST_CL;
 
+wire [3:0] DR_CORE_LOGIC;
+wire [3:0] BIST_CORE_LOGIC;
+
 // �������� ������� ��� �����������
 assign TMS_LA = TMS;
 assign TCK_LA = TCK;
@@ -103,7 +106,6 @@ wire       INTEST_SELECT;
 wire	   USERCODE_SELECT;
 wire       RUNBIST_SELECT;
 wire 	   GETTEST_SELECT;
-wire 	   SETSTATE_SELECT;
 
 //
 wire [9:0] BSR;
@@ -113,12 +115,13 @@ wire [7:0] IR_REG_OUT;
 
 wire       RESET_SM;
 wire       error;
-wire [3:0] CL_INPUT;
-wire [3:0] ASSIGN_STATE;
-wire [7:0] BIST_DATA;
-wire [3:0] BIST_OUT;
-//wire [3:0] bist_data_out;
+wire [4:0] CL_INPUT;
+wire [4:0] BIST_OUT;
+wire [15:0] BIST_DATA;
 
+//////////////////////////////////////////
+// clk for Core_logic with RUNBIST case
+//////////////////////////////////////////
 wire clock = RUNBIST_SELECT ? clk : TCK;
 
 tap_controller test_access_port
@@ -160,7 +163,6 @@ state_decoder state_decoder_sample
 , .USERCODE_SELECT(USERCODE_SELECT)
 , .RUNBIST_SELECT(RUNBIST_SELECT)
 , .GETTEST_SELECT(GETTEST_SELECT)
-, .SETSTATE_SELECT(SETSTATE_SELECT)
 );
 
 dr test_data_register
@@ -175,7 +177,7 @@ dr test_data_register
 , .EXTEST_SELECT(EXTEST_SELECT)
 , .INTEST_SELECT(INTEST_SELECT)
 , .USERCODE_SELECT(USERCODE_SELECT)
-, .CORE_LOGIC(CORE_LOGIC)
+, .CORE_LOGIC(DR_CORE_LOGIC)
 , .ID_REG_TDO(ID_REG_TDO)
 , .BSR_TDO(BSR_TDO)
 , .BSR(BSR)
@@ -186,7 +188,6 @@ dr test_data_register
 , .BIST_DATA(BIST_DATA)
 , .RUNBIST_SELECT(RUNBIST_SELECT)
 , .GETTEST_SELECT(GETTEST_SELECT)
-, .SETSTATE_SELECT(SETSTATE_SELECT)
 );
 
 bypass bypass_tar
@@ -202,9 +203,15 @@ core_logic core_logic_inst
   .clk(clock) 
 , .X(CL_INPUT)
 , .Y(CORE_LOGIC)
-, .ASSIGN_STATE(ASSIGN_STATE)
 , .enable(enable)
 );
+///////////////////////////////////////////////////////////////////////////////////////
+// MUX Core_Logic INPUT & OUTPUT
+///////////////////////////////////////////////////////////////////////////////////////
+assign CL_INPUT  = RUNBIST_SELECT | !INTEST_SELECT | GETTEST_SELECT ? BIST_OUT : {INTEST_CL, 1'b0};
+
+assign BIST_CORE_LOGIC = RUNBIST_SELECT  ? CORE_LOGIC : 4'b0000;
+assign DR_CORE_LOGIC   = !RUNBIST_SELECT ? CORE_LOGIC : 4'b0000;
 
 Bist #(.DEPTH(DEPTH)) BIST_INST
 (
@@ -215,13 +222,11 @@ Bist #(.DEPTH(DEPTH)) BIST_INST
 , .BSR(BSR)
 , .RUNBIST_SELECT(RUNBIST_SELECT)
 , .GETTEST_SELECT(GETTEST_SELECT)
-, .SETSTATE_SELECT(SETSTATE_SELECT)
-, .BIST_IN(CORE_LOGIC)
+, .BIST_IN(BIST_CORE_LOGIC)
 , .BIST_OUT(BIST_OUT)
 , .BIST_DATA(BIST_DATA)
 , .RESET_SM(RESET_SM)
 , .error(error)
-, .ASSIGN_STATE(ASSIGN_STATE)
 );
 
 always @(posedge TCK) begin
@@ -245,24 +250,12 @@ localparam INTEST   = 4'h3;
 localparam USERCODE = 4'h8;
 localparam RUNBIST  = 4'h4;
 
-assign CL_INPUT = RUNBIST_SELECT | !SETSTATE_SELECT | !GETTEST_SELECT ? BIST_OUT : INTEST_CL;
-assign enable   = (RUNBIST_SELECT |  INTEST_SELECT   | SETSTATE_SELECT) & (!TLR & !RESET_SM) ? 1'b1 : 1'b0; 
 
-//reg [3:0] cl_temp;
+assign enable   = (RUNBIST_SELECT |  INTEST_SELECT) & (!TLR & !RESET_SM) ? 1'b1 : 1'b0; 
 
-// always @(posedge TCK) 
-// begin
-// 	 if ( RUNBIST_SELECT ) begin
-// 	     cl_temp <=  bist_data_out;
-// 	 end else begin 
-// 	 	 if ( SETSTATE_SELECT ) begin
-// 		 cl_temp <=  INTEST_CL;
-// 		 end
-// 	 end
-// end
-
-//assign CL_INPUT = cl_temp; 
-
+///////////////////////////////////////////////////////////////////////////////////////
+// MUX TDO
+///////////////////////////////////////////////////////////////////////////////////////
 always @(posedge TCK) begin
     if ( SHIFTDR ) begin
         case(LATCH_JTAG_IR)
@@ -281,16 +274,9 @@ always @(posedge TCK) begin
     end
 end
 
-// assign LEDs[0] = INTEST_SELECT ? INTEST_CL[0] : SAMPLE_SELECT ? EXTEST_IO[0] : TUMBLERS[0];
-// assign LEDs[1] = INTEST_SELECT ? INTEST_CL[1] : SAMPLE_SELECT ? EXTEST_IO[1] : TUMBLERS[1];
-// assign LEDs[2] = INTEST_SELECT ? INTEST_CL[2] : SAMPLE_SELECT ? EXTEST_IO[2] : TUMBLERS[2];
-// assign LEDs[3] = INTEST_SELECT ? INTEST_CL[3] : SAMPLE_SELECT ? EXTEST_IO[3] : TUMBLERS[3];
-
-// assign LEDs[4] = INTEST_SELECT ? CORE_LOGIC[0] : SAMPLE_SELECT ? INTEST_CL[0] : EXTEST_IO[0];
-// assign LEDs[5] = INTEST_SELECT ? CORE_LOGIC[1] : SAMPLE_SELECT ? INTEST_CL[1] : EXTEST_IO[1];
-// assign LEDs[6] = INTEST_SELECT ? CORE_LOGIC[2] : SAMPLE_SELECT ? INTEST_CL[2] : EXTEST_IO[2];
-// assign LEDs[7] = INTEST_SELECT ? CORE_LOGIC[3] : SAMPLE_SELECT ? INTEST_CL[3] : EXTEST_IO[3];
-
+///////////////////////////////////////////////////////////////////////////////////////
+// MUX LED's
+///////////////////////////////////////////////////////////////////////////////////////
 always @(posedge TCK) begin
     case(LATCH_JTAG_IR)
     IDCODE:     begin LEDs <= IR_REG_OUT;                                               end
@@ -298,7 +284,7 @@ always @(posedge TCK) begin
     EXTEST:     begin LEDs <= { EXTEST_IO, TUMBLERS   };                                end
     INTEST:     begin LEDs <= { CORE_LOGIC, INTEST_CL };                                end
     USERCODE:   begin LEDs <= UR_OUT;                                                   end
-    RUNBIST:    begin LEDs <= TUMBLERS[0] ? BIST_DATA : { 6'b000000, error, RESET_SM }; end
+    //RUNBIST:    begin LEDs <= TUMBLERS[0] ? BIST_DATA : { 6'b000000, error, RESET_SM }; end
     default:    begin LEDs <= { EXTEST_IO, INTEST_CL  };                                end
     endcase
 end

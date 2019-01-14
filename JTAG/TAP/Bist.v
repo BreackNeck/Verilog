@@ -16,35 +16,20 @@ The DEPTH need not be a power of 2.
 ,   input            TLR 
 ,   input            RUNBIST_SELECT
 ,   input            GETTEST_SELECT
-,   input            SETSTATE_SELECT
 ,   input      [3:0] BIST_IN
-,   output     [3:0] BIST_OUT
+,   output     [4:0] BIST_OUT
 ,   output reg       RESET_SM
 ,   output reg       error
-,   output     [7:0] BIST_DATA
+,   output     [15:0] BIST_DATA
 ,   input            UPDATEDR
 ,   input      [9:0] BSR
-,   output     [3:0] ASSIGN_STATE
 );
 
-wire [3:0] config_bsr;
-assign config_bsr = BSR[9:6];
+wire [4:0] config_bsr;
+assign config_bsr = BSR[9:5];
 
-wire [3:0] check_bsr;
-assign check_bsr = BSR[5:2];
-
-wire [3:0] state_number;
-assign state_number = BSR[9:6];
-
-reg [3:0] assign_state;
-
-always @(posedge TCK) 
-    begin
-         if (TLR)                             assign_state <= 4'b0000;                   
-         else if (SETSTATE_SELECT & UPDATEDR) assign_state <= state_number;                   
-    end
-
-assign  ASSIGN_STATE = assign_state;
+wire [4:0] check_bsr;
+assign check_bsr = BSR[4:0];
 
 function integer clog2;
     input integer value;
@@ -56,65 +41,64 @@ function integer clog2;
 endfunction
 
 localparam WIDTH = clog2(DEPTH);
+localparam BIT_STOP_FLAG  = 0;
+localparam BIT_STATE_FLAG = 0;
+localparam SET_STATE_FLAG = 1'b1;
+localparam STOP_BIT_FLAG  = 1'b1;
 
-reg [3:0] bist_config[0:DEPTH-1];
+reg [4:0] bist_config[0:DEPTH-1];
 initial $readmemb("bistconfig.io", bist_config, 0, DEPTH-1); // Initial Regestry file (memory) (("<file_name>", <memory_name>, memory_start, memory_finish");)
 
-reg [3:0] bist_check[0:DEPTH-1];
+reg [4:0] bist_check[0:DEPTH-1];
 initial $readmemb("bistcheck.io", bist_check, 0, DEPTH-1); // Check transition result
 
-reg [WIDTH-1:0] counter;
-reg [WIDTH-1:0] temp;
+reg [WIDTH-1:0] pc_load;
+reg [WIDTH-1:0] pc_safe;
 
 always @(posedge TCK) 
     begin
         if (TLR) 
             begin
-                counter <= 0;    
-                temp <= DEPTH - 1; 
+                pc_load <= 0;    
+                pc_safe <= DEPTH - 1; 
             end 
         else if (GETTEST_SELECT) 
                 begin
                     if (UPDATEDR) 
                         begin
-                            bist_config[counter] <= config_bsr;
-                            bist_check[counter]  <= check_bsr;
-                            counter <= counter + 1'b1;    
-                            temp <= counter;       
+                            bist_config[pc_load] <= config_bsr;
+                            bist_check[pc_load]  <= check_bsr;
+                            pc_load <= pc_load + 1'b1;    
+                            pc_safe <= pc_load;       
                         end
-                end else counter <= 0;        
+                end else pc_load <= 0;        
     end
 
 reg [WIDTH-1:0] pc;
-wire stop_command;
+wire signal_stop;
 reg cycle;
-assign stop_command  = pc == temp; // signal stop for RESET_SM
+assign signal_stop   = (pc == pc_safe) | (bist_check[pc][BIT_STOP_FLAG] == STOP_BIT_FLAG) | error; // signal stop for RESET_SM
 
 always @(posedge clk) begin
-    if (TLR | stop_command) pc <= 0;
-    else if (RUNBIST_SELECT && !RESET_SM && !cycle) pc <= pc + 1;
+    if (TLR | signal_stop ) pc <= 0;
+    else if (RUNBIST_SELECT && !RESET_SM) pc <= pc + 1;
 end
+assign BIST_OUT  = RUNBIST_SELECT ? bist_config[pc] : 5'b00000;
+
 
 always @(posedge clk) 
     begin
-        if(TLR) error <= 0;
-        else if(pc) error <= BIST_IN != bist_check[pc-1];
+        if (TLR) error <= 0;
+        else if (pc) error <= BIST_IN != bist_check[pc-1][4:1];
     end
-
-always @(posedge clk) begin
-    if (TLR)                                                         cycle <= 0;
-    else if (BIST_IN != bist_check[pc-1] & SETSTATE_SELECT)          cycle <= 1;
-end
 
 always @(posedge clk) 
     begin
         if (TLR | !RUNBIST_SELECT) RESET_SM <= 0;
-        else if (stop_command)     RESET_SM <= 1;
+        else if (signal_stop )     RESET_SM <= 1;
     end
 
-assign BIST_OUT  = RUNBIST_SELECT ? bist_config[pc] : 4'b1001;
-assign BIST_DATA = RESET_SM & !error ? 8'hFF : pc - 1;
+
+assign BIST_DATA = RESET_SM & !error ? 16'hFFFF : pc - 1;
 
 endmodule
-
-
