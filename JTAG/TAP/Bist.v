@@ -102,6 +102,6 @@ always @(posedge clk)
     end
 
 
-assign BIST_STATUS = RESET_SM & !error ? {bist_check[pc-1][4:1], bist_config[pc][4:1], bist_check[pc][4:1], 4'hF} : {bist_check[pc-1][4:1], bist_config[pc][4:1], bist_check[pc][4:1], 4'h5};
+assign BIST_STATUS = !RESET_SM & !error ? {bist_check[pc-1][4:1], bist_config[pc][4:1], bist_check[pc][4:1], 4'hF} : {bist_check[pc-1][4:1], bist_config[pc][4:1], bist_check[pc][4:1], 4'h5};
 
 endmodule
