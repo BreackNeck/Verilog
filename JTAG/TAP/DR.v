@@ -10,6 +10,7 @@ module dr
 ,   output reg       ID_REG_TDO
 ,   output reg       USERCODE_REG_TDO
 ,   output reg       BSR_TDO
+, 	output reg  	 STATUS_BIST_REG_TDO
 
 ,   input            IDCODE_SELECT
 ,   input            SAMPLE_SELECT
@@ -26,7 +27,6 @@ module dr
 ,   input       [15:0] BIST_STATUS
  
 ,   output reg  [9:0]  BSR
-, 	output reg  [15:0] STATUS_BIST_REG_TDO
 ,   input       [3:0]  TUMBLERS
 ,   output      [7:0]  UR_OUT
 );

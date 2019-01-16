@@ -14,6 +14,7 @@ The DEPTH need not be a power of 2.
     input             clk
 ,   input             TCK
 ,   input             TLR 
+,   input             enable
 ,   input             RUNBIST_SELECT
 ,   input             GETTEST_SELECT
 ,   input      [3:0]  BIST_IN
@@ -82,6 +83,8 @@ always @(posedge clk) begin
    signal_stop  <= (pc == pc_safe) | (bist_check[pc][BIT_STOP_FLAG] == STOP_BIT_FLAG); // signal stop for RESET_SM 
 end
 
+
+
 always @(posedge clk) begin
     if (TLR | signal_stop ) pc <= 0;
     else if (RUNBIST_SELECT && !RESET_SM) pc <= pc + 1;
@@ -101,7 +104,12 @@ always @(posedge clk)
         else if (signal_stop )     RESET_SM <= 1;
     end
 
+reg [WIDTH-1:0] bc;
 
-assign BIST_STATUS = !RESET_SM & !error ? {bist_check[pc-1][4:1], bist_config[pc][4:1], bist_check[pc][4:1], 4'hF} : {bist_check[pc-1][4:1], bist_config[pc][4:1], bist_check[pc][4:1], 4'h5};
+always @(posedge clk) begin
+    if (enable) bc <= pc-1;
+end
+
+assign BIST_STATUS = RESET_SM & !error ? {bist_check[bc-1][4:1], bist_config[bc][4:1], bist_check[bc][4:1], 4'hF} : {bist_check[pc-1][4:1], bist_config[pc][4:1], bist_check[pc][4:1], 4'h5};
 
 endmodule

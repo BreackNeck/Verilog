@@ -108,6 +108,48 @@ task data;
   end 
 endtask
 
+task data16;
+  input [15:0] data;
+  begin
+    TMS = 1; @(negedge TCK); // Select_DR_Scan <- 7
+    TMS = 0; @(negedge TCK); // Capture_DR <- 7
+    TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+
+      //For LBS
+      // TDI = 0; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      // TDI = 0; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+
+      TDI = data[0]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[1]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[2]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[3]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+
+      TDI = data[4]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[5]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[6]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[7]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[8]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[9]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[10]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[11]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[12]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[13]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[14]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[15]; TMS = 1; @(negedge TCK); // EXIT1_DR <- 2
+
+      TDI = 0; TMS = 0; @(negedge TCK); // PAUSE_DR <- 3
+      TDI = 0; TMS = 0; @(negedge TCK); // PAUSE_DR <- 3
+      TDI = 0; TMS = 0; @(negedge TCK); // PAUSE_DR <- 3
+      TDI = 0; TMS = 0; @(negedge TCK); // PAUSE_DR <- 3
+
+    TMS = 1; @(negedge TCK); // EXIT2_DR  <- 0
+    TMS = 1; @(negedge TCK); // UPDATE_DR <- 5
+    TMS = 0; @(negedge TCK); // RUN_TEST_IDLE <- C
+    TMS = 0; @(negedge TCK); // RUN_TEST_IDLE <- C
+    TMS = 0; @(negedge TCK); // RUN_TEST_IDLE <- C
+  end 
+endtask
+
 task reset;
   begin
     TMS = 1; @(negedge TCK);
@@ -154,10 +196,15 @@ initial begin
     data(10'b1011000010); //b1
     data(10'b1111000000); //F0
     data(10'b0001000100); //12
-    data(10'b1111001010); //F5
+    data(10'b1111001010); //5F
 
 
-    command(RUNBIST); 
+    command(RUNBIST);
+ repeat(5) @(negedge TCK);  
+
+    data16(16'b1010101010101010);
+    
+     
   // // ///////////////////////////////////////
    
     // command(GETTEST);

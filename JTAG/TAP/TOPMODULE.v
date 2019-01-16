@@ -96,6 +96,7 @@ wire       INSTR_TDO;
 wire       ID_REG_TDO;
 wire       BYPASS_TDO;
 wire       BSR_TDO;
+wire	   STATUS_BIST_REG_TDO;
 
 // ��������� �������
 wire       IDCODE_SELECT;
@@ -188,6 +189,7 @@ dr test_data_register
 , .BIST_STATUS(BIST_STATUS)
 , .RUNBIST_SELECT(RUNBIST_SELECT)
 , .GETTEST_SELECT(GETTEST_SELECT)
+, .STATUS_BIST_REG_TDO(STATUS_BIST_REG_TDO)
 );
 
 bypass bypass_tar
@@ -218,6 +220,7 @@ Bist #(.DEPTH(DEPTH)) BIST_INST
   .TCK(TCK)
 , .clk(clk)
 , .TLR(TLR)
+, .enable(enable)
 , .UPDATEDR(UPDATEDR)
 , .BSR(BSR)
 , .RUNBIST_SELECT(RUNBIST_SELECT)
