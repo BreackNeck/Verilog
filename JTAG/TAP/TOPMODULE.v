@@ -96,6 +96,7 @@ wire       INSTR_TDO;
 wire       ID_REG_TDO;
 wire       BYPASS_TDO;
 wire       BSR_TDO;
+wire	   STATUS_BIST_REG_TDO;
 
 // ��������� �������
 wire       IDCODE_SELECT;
@@ -117,7 +118,7 @@ wire       RESET_SM;
 wire       error;
 wire [4:0] CL_INPUT;
 wire [4:0] BIST_OUT;
-wire [15:0] BIST_DATA;
+wire [15:0] BIST_STATUS;
 
 //////////////////////////////////////////
 // clk for Core_logic with RUNBIST case
@@ -185,7 +186,7 @@ dr test_data_register
 , .EXTEST_IO(EXTEST_IO)
 , .INTEST_CL(INTEST_CL)
 , .UR_OUT(UR_OUT)
-, .BIST_DATA(BIST_DATA)
+, .BIST_STATUS(BIST_STATUS)
 , .RUNBIST_SELECT(RUNBIST_SELECT)
 , .GETTEST_SELECT(GETTEST_SELECT)
 );
@@ -224,7 +225,7 @@ Bist #(.DEPTH(DEPTH)) BIST_INST
 , .GETTEST_SELECT(GETTEST_SELECT)
 , .BIST_IN(BIST_CORE_LOGIC)
 , .BIST_OUT(BIST_OUT)
-, .BIST_DATA(BIST_DATA)
+, .BIST_STATUS(BIST_STATUS)
 , .RESET_SM(RESET_SM)
 , .error(error)
 );
@@ -259,14 +260,14 @@ assign enable   = (RUNBIST_SELECT |  INTEST_SELECT) & (!TLR & !RESET_SM) ? 1'b1 
 always @(posedge TCK) begin
     if ( SHIFTDR ) begin
         case(LATCH_JTAG_IR)
-           		IDCODE:     begin TDO <= ID_REG_TDO;       end
-				BYPASS:     begin TDO <= BYPASS_TDO;       end
-				SAMPLE:     begin TDO <= BSR_TDO;          end
-				EXTEST:     begin TDO <= BSR_TDO;          end
-				INTEST:     begin TDO <= BSR_TDO;          end
-				USERCODE:   begin TDO <= BSR_TDO;          end
-				RUNBIST:    begin TDO <= BSR_TDO;          end
-            	default:    begin TDO <= ID_REG_TDO;       end
+           		IDCODE:     begin TDO <= ID_REG_TDO;       	  end
+				BYPASS:     begin TDO <= BYPASS_TDO;       	  end
+				SAMPLE:     begin TDO <= BSR_TDO;          	  end
+				EXTEST:     begin TDO <= BSR_TDO;          	  end
+				INTEST:     begin TDO <= BSR_TDO;          	  end
+				USERCODE:   begin TDO <= BSR_TDO;          	  end
+				RUNBIST:    begin TDO <= BSR_TDO;          	  end
+            	default:    begin TDO <= STATUS_BIST_REG_TDO; end
         endcase  
     end else
 	 if ( SHIFTIR ) begin
@@ -279,13 +280,13 @@ end
 ///////////////////////////////////////////////////////////////////////////////////////
 always @(posedge TCK) begin
     case(LATCH_JTAG_IR)
-    IDCODE:     begin LEDs <= IR_REG_OUT;                                               end
-    SAMPLE:     begin LEDs <= { EXTEST_IO, INTEST_CL  };                                end
-    EXTEST:     begin LEDs <= { EXTEST_IO, TUMBLERS   };                                end
-    INTEST:     begin LEDs <= { CORE_LOGIC, INTEST_CL };                                end
-    USERCODE:   begin LEDs <= UR_OUT;                                                   end
-    //RUNBIST:    begin LEDs <= TUMBLERS[0] ? BIST_DATA : { 6'b000000, error, RESET_SM }; end
-    default:    begin LEDs <= { EXTEST_IO, INTEST_CL  };                                end
+    IDCODE:     begin LEDs <= IR_REG_OUT;                                           end
+    SAMPLE:     begin LEDs <= { EXTEST_IO, INTEST_CL  };                            end
+    EXTEST:     begin LEDs <= { EXTEST_IO, TUMBLERS   };                            end
+    INTEST:     begin LEDs <= { CORE_LOGIC, INTEST_CL };                            end
+    USERCODE:   begin LEDs <= UR_OUT;                                               end
+    RUNBIST:    begin LEDs <= TUMBLERS[0] ? BIST_STATUS [15:8] : BIST_STATUS [7:0]; end
+    default:    begin LEDs <= { EXTEST_IO, INTEST_CL  };                            end
     endcase
 end
 

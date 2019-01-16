@@ -11,18 +11,18 @@ The DEPTH need not be a power of 2.
     //parameter WIDTH = $clog2(DEPTH);
 )
 (
-    input            clk
-,   input            TCK
-,   input            TLR 
-,   input            RUNBIST_SELECT
-,   input            GETTEST_SELECT
-,   input      [3:0] BIST_IN
-,   output     [4:0] BIST_OUT
-,   output reg       RESET_SM
-,   output reg       error
-,   output     [15:0] BIST_DATA
-,   input            UPDATEDR
-,   input      [9:0] BSR
+    input             clk
+,   input             TCK
+,   input             TLR 
+,   input             RUNBIST_SELECT
+,   input             GETTEST_SELECT
+,   input      [3:0]  BIST_IN
+,   output     [4:0]  BIST_OUT
+,   output reg        RESET_SM
+,   output reg        error
+,   output     [15:0] BIST_STATUS
+,   input             UPDATEDR
+,   input      [9:0]  BSR
 );
 
 wire [4:0] config_bsr;
@@ -102,6 +102,6 @@ always @(posedge clk)
     end
 
 
-assign BIST_DATA = RESET_SM & !error ? 16'hFFFF : pc - 1;
+assign BIST_STATUS = RESET_SM & !error ? {bist_check[pc-1][4:1], bist_config[pc][4:1], bist_check[pc][4:1], 4'hF} : {bist_check[pc-1][4:1], bist_config[pc][4:1], bist_check[pc][4:1], 4'h5};
 
 endmodule
