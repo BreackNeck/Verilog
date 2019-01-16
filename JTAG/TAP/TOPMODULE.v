@@ -96,7 +96,6 @@ wire       INSTR_TDO;
 wire       ID_REG_TDO;
 wire       BYPASS_TDO;
 wire       BSR_TDO;
-wire	   STATUS_BIST_REG_TDO;
 
 // ��������� �������
 wire       IDCODE_SELECT;
@@ -266,8 +265,8 @@ always @(posedge TCK) begin
 				EXTEST:     begin TDO <= BSR_TDO;          	  end
 				INTEST:     begin TDO <= BSR_TDO;          	  end
 				USERCODE:   begin TDO <= BSR_TDO;          	  end
-				RUNBIST:    begin TDO <= BSR_TDO;          	  end
-            	default:    begin TDO <= STATUS_BIST_REG_TDO; end
+				RUNBIST:    begin TDO <= STATUS_BIST_REG_TDO; end
+            	default:    begin TDO <= ID_REG_TDO;       	  end
         endcase  
     end else
 	 if ( SHIFTIR ) begin
