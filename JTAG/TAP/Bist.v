@@ -75,9 +75,12 @@ always @(posedge TCK)
     end
 
 reg [WIDTH-1:0] pc;
-wire signal_stop;
+reg signal_stop;
 reg cycle;
-assign signal_stop   = (pc == pc_safe) | (bist_check[pc][BIT_STOP_FLAG] == STOP_BIT_FLAG) | error; // signal stop for RESET_SM
+
+always @(posedge clk) begin
+   signal_stop  <= (pc == pc_safe) | (bist_check[pc][BIT_STOP_FLAG] == STOP_BIT_FLAG); // signal stop for RESET_SM 
+end
 
 always @(posedge clk) begin
     if (TLR | signal_stop ) pc <= 0;
@@ -88,8 +91,8 @@ assign BIST_OUT  = RUNBIST_SELECT ? bist_config[pc] : 5'b00000;
 
 always @(posedge clk) 
     begin
-        if (TLR) error <= 0;
-        else if (pc) error <= BIST_IN != bist_check[pc-1][4:1];
+        if (TLR)                            error <= 0;
+        else if (pc & !bist_check[pc-1][0]) error <= BIST_IN != bist_check[pc-1][4:1] ;
     end
 
 always @(posedge clk) 
