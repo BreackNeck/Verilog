@@ -118,16 +118,17 @@ always @(posedge clk) begin
     if (enable) bc <= pc-1;
 end
 
-reg [7:0] CORRECT_CHECK;
+reg [3:0] CORRECT_CHECK;
 
 always @(posedge clk) begin
-  CORRECT_CHECK [7:4] <= CORRECT_CHECK [3:0]; 
-  CORRECT_CHECK [3:0] = BIST_IN; 
+    if (pc_safe-1 < pc) begin
+        CORRECT_CHECK [3:0] = BIST_IN; 
+     end
 end
 
 
 
 assign BIST_STATUS = RESET_SM & !error ? {bist_check[bc-1][4:1], bist_config[bc][4:1], bist_check[bc][4:1], 4'hF} :
-                                         {bist_check[bc-1][4:1], bist_config[bc][4:1], CORRECT_CHECK[7:4],  4'h5} ;
+                                         {bist_check[bc-1][4:1], bist_config[bc][4:1], CORRECT_CHECK[3:0],  4'h5} ;
 
 endmodule
