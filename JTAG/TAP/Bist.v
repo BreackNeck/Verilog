@@ -81,7 +81,7 @@ reg signal_stop;
 reg cycle;
 
 always @(posedge clk) begin
-   signal_stop  <= (pc == pc_safe-1) | (bist_check[pc][BIT_STOP_FLAG] == STOP_BIT_FLAG); // signal stop for RESET_SM 
+   signal_stop  <= (pc == pc_safe) | (bist_check[pc][BIT_STOP_FLAG] == STOP_BIT_FLAG); // signal stop for RESET_SM 
 end
 
 always @(posedge clk) begin
@@ -115,9 +115,9 @@ always @(posedge clk)
 reg [WIDTH-1:0] bc;
 
 always @(posedge clk) begin
-    if (enable) bc <= pc;
+    if (enable) bc <= pc-1;
 end
 
-assign BIST_STATUS = RESET_SM & !error ? {bist_check[bc-1][4:1], bist_config[bc][4:1], bist_check[bc][4:1], 4'hF} : {bist_check[pc-1][4:1], bist_config[pc][4:1], bist_check[pc][4:1], 4'h5};
+assign BIST_STATUS = RESET_SM & !error ? {bist_check[bc-1][4:1], bist_config[bc][4:1], bist_check[bc][4:1], 4'hF} : {bist_check[bc-1][4:1], bist_config[bc][4:1], bist_check[bc][4:1], 4'h5};
 
 endmodule
