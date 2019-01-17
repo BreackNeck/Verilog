@@ -86,7 +86,7 @@ wire		CAPTUREDR;
 wire		SHIFTDR;
 wire		UPDATEDR;
 wire		TLR;
-//wire		enable;
+wire		enable;
 
 // ������� ��� ������
 wire [3:0] LATCH_JTAG_IR;

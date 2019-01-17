@@ -108,6 +108,40 @@ task data;
   end 
 endtask
 
+task data8;
+  input [7:0] data;
+  begin
+    TMS = 1; @(negedge TCK); // Select_DR_Scan <- 7
+    TMS = 0; @(negedge TCK); // Capture_DR <- 7
+    TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+
+      // For LBS
+      TDI = 0; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = 0; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+
+      TDI = data[0]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[1]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[2]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[3]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+
+      TDI = data[4]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[5]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[6]; TMS = 0; @(negedge TCK); // Shidt_DR <- 2
+      TDI = data[7]; TMS = 1; @(negedge TCK); // EXIT1_DR <- 2
+
+      TDI = 0; TMS = 0; @(negedge TCK); // PAUSE_DR <- 3
+      TDI = 0; TMS = 0; @(negedge TCK); // PAUSE_DR <- 3
+      TDI = 0; TMS = 0; @(negedge TCK); // PAUSE_DR <- 3
+      TDI = 0; TMS = 0; @(negedge TCK); // PAUSE_DR <- 3
+
+    TMS = 1; @(negedge TCK); // EXIT2_DR  <- 0
+    TMS = 1; @(negedge TCK); // UPDATE_DR <- 5
+    TMS = 0; @(negedge TCK); // RUN_TEST_IDLE <- C
+    TMS = 0; @(negedge TCK); // RUN_TEST_IDLE <- C
+    TMS = 0; @(negedge TCK); // RUN_TEST_IDLE <- C
+  end 
+endtask
+
 task data16;
   input [15:0] data;
   begin
@@ -190,17 +224,18 @@ initial begin
     data(10'b0001000100); //12
     data(10'b1111001010); //F5
 
-    data(10'b0000100100); //02  
+    // data(10'b0000100100); //02  
 
-    data(10'b0000000100); //02
-    data(10'b1011000010); //b1
-    data(10'b1111000000); //F0
-    data(10'b0001000100); //12
-    data(10'b1111001010); //5F
+    // data(10'b0000000100); //02
+    // data(10'b1011000010); //b1
+    // data(10'b1111000000); //F0 1111
+    // data(10'b0001000100); //12
+    // data(10'b1111001010); //F5
 
 
     command(RUNBIST);
- repeat(5) @(negedge TCK);  
+
+    //repeat(1) @(negedge TCK);  
 
     data16(16'b1010101010101010);
     
@@ -248,13 +283,13 @@ initial begin
   //command(SAMPLE); data(8'b10100101);
   //command(EXTEST); data(8'b01101111);
   
-  // command(INTEST); data(8'b10101001);
-  // command(INTEST); data(8'b10101001);
-  // command(INTEST); data(8'b00100011);
-  // command(INTEST); data(8'b01110110);
-  // command(INTEST); data(8'b00000000);
-  // command(INTEST); data(8'b11011111);
-  // command(INTEST); data(8'b00000010);
+  // command(INTEST); data8(8'b10101001);
+  // command(INTEST); data8(8'b10101001);
+  // command(INTEST); data8(8'b00100011);
+  // command(INTEST); data8(8'b01110110);
+  // command(INTEST); data8(8'b00000000);
+  // command(INTEST); data8(8'b11011111);
+  // command(INTEST); data8(8'b00000010);
 
   ///////////////////////////////////// 5210 - 1270 = 3940 ns; 
   ///////////////////////////////////// 1 ???? - 10 ns; ????? ???????????? ? ??????? ??????? - 394 ????? (3940 ns);

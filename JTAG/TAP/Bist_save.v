@@ -76,46 +76,38 @@ always @(posedge TCK)
     end
 
 reg [WIDTH-1:0] pc;
-reg [WIDTH-1:0] pc_bist;
 reg signal_stop;
 reg cycle;
 
 always @(posedge clk) begin
-   signal_stop  <= (pc == pc_safe-1) | (bist_check[pc][BIT_STOP_FLAG] == STOP_BIT_FLAG); // signal stop for RESET_SM 
+   signal_stop  <= (pc == pc_safe) | (bist_check[pc][BIT_STOP_FLAG] == STOP_BIT_FLAG); // signal stop for RESET_SM 
 end
+
+
 
 always @(posedge clk) begin
     if (TLR | signal_stop ) pc <= 0;
-    else if (RUNBIST_SELECT && !RESET_SM && !cycle) begin 
-            pc <= pc + 1; 
-            pc_bist <= pc;
-         end
+    else if (RUNBIST_SELECT && !RESET_SM) pc <= pc + 1;
 end
-
 assign BIST_OUT  = RUNBIST_SELECT ? bist_config[pc] : 5'b00000;
+
 
 always @(posedge clk) 
     begin
-        if (TLR)                               error <= 0;
+        if (TLR)                             error <= 0;
         else if (pc & (!bist_config[pc-1][0])) error <= BIST_IN != bist_check[pc-1][4:1] ;
     end
 
-///////////////////////////////////////////////////////////////////////////////////////////
-always @(posedge clk) begin
-    if (TLR)                                                                   cycle <= 0;
-    else if ( BIST_IN != bist_check[pc-1][4:1] & bist_config[pc-1][0] != 1'b1) cycle <= 1;
-end
-
 always @(posedge clk) 
     begin
-        if (TLR | !RUNBIST_SELECT)  RESET_SM <= 0;
-        else if ( signal_stop )     RESET_SM <= 1;
+        if (TLR | !RUNBIST_SELECT) RESET_SM <= 0;
+        else if (signal_stop )     RESET_SM <= 1;
     end
 
 reg [WIDTH-1:0] bc;
 
 always @(posedge clk) begin
-    if (enable) bc <= pc;
+    if (enable) bc <= pc_safe;
 end
 
 assign BIST_STATUS = RESET_SM & !error ? {bist_check[bc-1][4:1], bist_config[bc][4:1], bist_check[bc][4:1], 4'hF} : {bist_check[pc-1][4:1], bist_config[pc][4:1], bist_check[pc][4:1], 4'h5};
