@@ -254,7 +254,7 @@ localparam USERCODE = 4'h8;
 localparam RUNBIST  = 4'h4;
 
 
-assign enable   = (RUNBIST_SELECT |  INTEST_SELECT) & (!TLR & !RESET_SM) ? 1'b1 : 1'b0; 
+assign enable   = (RUNBIST_SELECT |  INTEST_SELECT) & (!TLR & !RESET_SM & !error) ? 1'b1 : 1'b0; 
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // MUX TDO
@@ -287,9 +287,10 @@ always @(posedge TCK) begin
     EXTEST:     begin LEDs <= { EXTEST_IO, TUMBLERS   };                            end
     INTEST:     begin LEDs <= { CORE_LOGIC, INTEST_CL };                            end
     USERCODE:   begin LEDs <= UR_OUT;                                               end
-    RUNBIST:    begin LEDs <= TUMBLERS[0] ? BIST_STATUS [15:8] : BIST_STATUS [7:0]; end
+    RUNBIST:    begin LEDs <= /*TUMBLERS[0] ? BIST_STATUS [15:8] :*/ BIST_STATUS [7:0]; end
     default:    begin LEDs <= { EXTEST_IO, INTEST_CL  };                            end
     endcase
 end
 
+//assign LEDs = TUMBLERS[0] ? BIST_STATUS [15:8] : BIST_STATUS [7:0];
 endmodule
