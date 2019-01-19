@@ -194,14 +194,14 @@ task reset;
   end
 endtask
 
-// task display_buffers;
-//   integer i;
-//   begin
-//     for ( i = 0; i < DEPTH; i = i + 1 ) begin
-//       $display("RAM %d -> %b | CHECK -> %b", i, TOPMODULE_sample.BuiltInSelfTest.bist_config[i], ics_sample.BuiltInSelfTest.bist_check[i]);
-//     end
-//   end 
-// endtask
+task display_buffers;
+  integer i;
+  begin
+    for ( i = 0; i < 15; i = i + 1 ) begin
+      $display("RAM %d -> %b | CHECK -> %b ", i, TOPMODULE_sample.BIST_INST.bist_config[i], TOPMODULE_sample.BIST_INST.bist_check[i]);
+    end
+  end 
+endtask
 
 // task info;
 //   begin
@@ -216,28 +216,29 @@ initial begin
 
   //display_buffers(); $display("++++++++++++++++++++++++++++++++++++++++");
 
-    command(GETTEST); 
+  command(GETTEST); 
+
+    data(10'b0000000100); //02
+    data(10'b1011000010); //b1 0010
+    data(10'b1111000000); //F0 0000
+    data(10'b0001000100); //12 0100
+    data(10'b1111001010); //F5 1010
+
+    data(10'b0000100000); //02  
 
     data(10'b0000000100); //02
     data(10'b1011000010); //b1
-    data(10'b1111000010); //F0 0000
+    data(10'b1111000000); //F0 1111
     data(10'b0001000100); //12
     data(10'b1111001010); //F5
 
-    // data(10'b0000100100); //02  
+  display_buffers();
 
-    // data(10'b0000000100); //02
-    // data(10'b1011000010); //b1
-    // data(10'b1111000000); //F0 1111
-    // data(10'b0001000100); //12
-    // data(10'b1111001010); //F5
+  command(RUNBIST);
 
+  repeat(10) @(negedge TCK);  
 
-    command(RUNBIST);
-
-   repeat(10) @(negedge TCK);  
-
-    data16(16'b0000000000000);
+   //  data16(16'b0000000000000);
     
      
   // // ///////////////////////////////////////

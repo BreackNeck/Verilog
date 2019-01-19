@@ -53,105 +53,71 @@ initial $readmemb("bistconfig.io", bist_config, 0, DEPTH-1); // Initial Regestry
 reg [4:0] bist_check[0:DEPTH-1];
 initial $readmemb("bistcheck.io", bist_check, 0, DEPTH-1); // Check transition result
 
-wire [3:0] bist_check_check;
-assign bist_check_check = bist_check[pc][4:1];
-wire [3:0] bist_config_check;
-assign bist_config_check = bist_config[pc][4:1];
-
 wire [WIDTH-1:0] width_param;
 assign width_param = WIDTH;
 
 reg [WIDTH-1:0] pc_load;
 reg [WIDTH-1:0] pc_safe;
 
-always @(posedge TCK) 
+always @(posedge TCK) begin
+    if (TLR) begin
+            pc_load <= 0;    
+            pc_safe <= DEPTH - 1; 
+        end 
+    else if ( GETTEST_SELECT ) 
     begin
-        if (TLR) 
+        if (UPDATEDR) 
             begin
-                pc_load <= 0;    
-                pc_safe <= DEPTH - 1; 
-            end 
-        else if (GETTEST_SELECT) 
-                begin
-                    if (UPDATEDR) 
-                        begin
-                            bist_config[pc_load] <= config_bsr;
-                            bist_check[pc_load]  <= check_bsr;
-                            pc_load <= pc_load + 1'b1;    
-                            pc_safe <= pc_load;       
-                        end
-                end else pc_load <= 0;        
-    end
+                bist_config[pc_load] <= config_bsr;
+                bist_check[pc_load]  <= check_bsr;
+                pc_load <= pc_load + 1'b1;    
+                pc_safe <= pc_load + 2;       
+            end
+    end else pc_load <= 0;        
+end
+
+wire signal_stop;
+
+assign signal_stop = (pc == pc_safe) & !error;
 
 reg [WIDTH-1:0] pc;
-reg [WIDTH-1:0] pc_bist;
-wire signal_stop;
-reg cycle;
-
-
-assign   signal_stop = (pc == pc_safe) | (bist_check[pc][BIT_STOP_FLAG] == STOP_BIT_FLAG) | error; // signal stop for RESET_SM 
-
-
 always @(posedge clk) begin
-    if (TLR | signal_stop ) pc <= 0;
-    else if (RUNBIST_SELECT && !RESET_SM && !cycle) begin 
-            pc <= pc + 1; 
-            pc_bist <= pc;
-         end
-end
-
-assign BIST_OUT  = RUNBIST_SELECT ? bist_config[pc] : 5'b00000;
-
-// always @(posedge clk) 
-//     begin
-//         if (TLR)                                                                                           error <= 0;
-//         else if (pc & (!bist_config[pc-1][0]) /*& (!bist_config[pc][0])*/) error <= BIST_IN != bist_check[pc-1][4:1] ; // pc bist_check[pc-1]
-//     end
-
-always @(posedge clk) 
-    begin
-        if (TLR ) error <= 0;
-        else if ((!bist_config[pc-1][0]) &  (BIST_IN != bist_check[pc-1][4:1]) & (!bist_config[pc][0])) begin           // pc bist_check[pc-1]
-                 error <= 1; 
-                 pc <= 0;
-             end
-    end
-
-///////////////////////////////////////////////////////////////////////////////////////////
-always @(posedge clk) begin
-    if (TLR)                                                                   cycle <= 0;
-    else if ( BIST_IN != bist_check[pc-1][4:1] & bist_config[pc-1][0] != 1'b1) cycle <= 1;
+    if      (TLR)                                     pc <= 0;
+    else if (RUNBIST_SELECT & !signal_stop & !error)  pc <= pc + 1;    
 end
 
 always @(posedge clk) begin
-        if (TLR | !RUNBIST_SELECT) RESET_SM <= 0;
-        else if ( signal_stop | error | !enable) begin 
-                RESET_SM <= 1;
-                //pc = 0;
-         end
+    if      (TLR)                                                            error <= 0;
+    else if (BIST_IN != bist_check[pc - 1][4:1] & !signal_stop & !set_state) error <= 1;
 end
 
-reg [WIDTH-1:0] bc;
-reg [WIDTH-1:0] zc;
-
+reg set_state;
 always @(posedge clk) begin
-    if (enable) bc <= pc-1;
+    set_state <= bist_config[pc][0];
 end
 
 always @(posedge clk) begin
-    if (enable & !error) zc <= pc-1;
+    RESET_SM <= RUNBIST_SELECT & (error|signal_stop);
 end
 
-reg [3:0] CORRECT_CHECK;
+// ---------- WIRE ----------
+wire [4:0] bist_check_wire;
+wire [4:0] bist_config_wire;
 
-always @(posedge clk) begin
-    if ( zc | bc ) begin
-        CORRECT_CHECK = BIST_IN; 
-     end
-end
+assign BIST_OUT = RUNBIST_SELECT ? bist_config[pc] : 5'b00000;
+assign bist_check_wire  = bist_check[pc];
+assign bist_config_wire = bist_config[pc];
 
-assign BIST_STATUS = RESET_SM & !error ? {bist_check[bc-1][4:1], bist_config[bc][4:1], bist_check[bc][4:1], 4'hF} :                                     
-                                         {bist_check[zc-1][4:1], bist_config[zc][4:1], CORRECT_CHECK,  4'h5} ;
+wire [15:0] EXEPTION_LESS_TWO;
+wire [15:0] EXEPTION_MORE_TWO;
 
-// assign BIST_STATUS = RESET_SM & !error ? 8'hFF : pc-1;
+
+
+assign EXEPTION_LESS_TWO = !error & (pc <= 2) ? { 4'h0, bist_config [pc-1][4:1], bist_check[pc-1][4:1], 4'hF} : 
+                                                { 4'h0, bist_config [pc-2][4:1], bist_check[pc-2][4:1], 4'h5};
+assign EXEPTION_MORE_TWO = !error & (pc > 2)  ? { bist_check[pc - 3][4:1], bist_config [pc-2][4:1], bist_check[pc-2][4:1], 4'hF} :
+                                                { bist_check[pc - 3][4:1], bist_config [pc-2][4:1], bist_check[pc-2][4:1], 4'h5};
+
+assign BIST_STATUS = pc > 2 ? EXEPTION_MORE_TWO : EXEPTION_LESS_TWO;
+
 endmodule

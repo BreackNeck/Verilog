@@ -254,7 +254,7 @@ localparam USERCODE = 4'h8;
 localparam RUNBIST  = 4'h4;
 
 
-assign enable   = (RUNBIST_SELECT |  INTEST_SELECT) & (!TLR & !RESET_SM & !error) ? 1'b1 : 1'b0; 
+assign enable = RUNBIST_SELECT & !RESET_SM ? 1'b1 : 1'b0; 
 
 ///////////////////////////////////////////////////////////////////////////////////////
 // MUX TDO
