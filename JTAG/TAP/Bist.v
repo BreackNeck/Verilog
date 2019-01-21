@@ -24,6 +24,10 @@ The DEPTH need not be a power of 2.
 ,   output     [15:0] BIST_STATUS
 ,   input             UPDATEDR
 ,   input      [9:0]  BSR
+
+
+,   output     [4:0]  bist_config_wire
+,   output     [4:0]  bist_check_wire
 );
 
 wire [4:0] config_bsr;
@@ -101,8 +105,8 @@ always @(posedge clk) begin
 end
 
 // ---------- WIRE ----------
-wire [4:0] bist_check_wire;
-wire [4:0] bist_config_wire;
+//wire [4:0] bist_check_wire;
+//wire [4:0] bist_config_wire;
 
 assign BIST_OUT = RUNBIST_SELECT ? bist_config[pc] : 5'b00000;
 assign bist_check_wire  = bist_check[pc];
@@ -119,5 +123,5 @@ assign EXEPTION_MORE_TWO = !error & (pc > 2)  ? { bist_check[pc - 3][4:1], bist_
                                                 { bist_check[pc - 3][4:1], bist_config [pc-2][4:1], bist_check[pc-2][4:1], 4'h5};
 
 assign BIST_STATUS = pc > 2 ? EXEPTION_MORE_TWO : EXEPTION_LESS_TWO;
-
+///1///
 endmodule

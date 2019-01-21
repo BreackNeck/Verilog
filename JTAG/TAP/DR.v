@@ -96,5 +96,5 @@ always @(negedge TCK) ID_REG_TDO   			<= ID_REG_COPY[0];
 always @(negedge TCK) STATUS_BIST_REG_TDO   <= STATUS_BIST_REG[0];
 
 assign UR_OUT = USERCODE_REG;
-
+///1///
 endmodule

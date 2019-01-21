@@ -50,7 +50,7 @@ The DEPTH need not be a power of 2.
                                // ��������� LA: 256 | 50 | 1 | 1
 										 // ��������� A1 Triger �� �������� �����
 										 
-,   output reg [7:0] LEDs      // LEDs[7] : W21 : LED7
+,   output 	   [7:0] LEDs      // LEDs[7] : W21 : LED7
 										 // LEDs[6] : Y22 : LED6
 										 // LEDs[5] : V20 : LED5
 										 // LEDs[4] : V19 : LED4
@@ -71,6 +71,9 @@ reg [3:0] INTEST_CL;
 
 wire [3:0] DR_CORE_LOGIC;
 wire [3:0] BIST_CORE_LOGIC;
+
+wire [4:0] bist_config_wire;
+wire [4:0] bist_check_wire;
 
 // �������� ������� ��� �����������
 assign TMS_LA = TMS;
@@ -230,6 +233,8 @@ Bist #(.DEPTH(DEPTH)) BIST_INST
 , .BIST_STATUS(BIST_STATUS)
 , .RESET_SM(RESET_SM)
 , .error(error)
+, .bist_config_wire(bist_config_wire)
+, .bist_check_wire(bist_check_wire)
 );
 
 always @(posedge TCK) begin
@@ -280,17 +285,31 @@ end
 ///////////////////////////////////////////////////////////////////////////////////////
 // MUX LED's
 ///////////////////////////////////////////////////////////////////////////////////////
-always @(posedge TCK) begin
-    case(LATCH_JTAG_IR)
-    IDCODE:     begin LEDs <= IR_REG_OUT;                                           end
-    SAMPLE:     begin LEDs <= { EXTEST_IO, INTEST_CL  };                            end
-    EXTEST:     begin LEDs <= { EXTEST_IO, TUMBLERS   };                            end
-    INTEST:     begin LEDs <= { CORE_LOGIC, INTEST_CL };                            end
-    USERCODE:   begin LEDs <= UR_OUT;                                               end
-    RUNBIST:    begin LEDs <= /*TUMBLERS[0] ? BIST_STATUS [15:8] :*/ BIST_STATUS [7:0]; end
-    default:    begin LEDs <= { EXTEST_IO, INTEST_CL  };                            end
-    endcase
-end
+// always @(posedge TCK) begin
+//     case(LATCH_JTAG_IR)
+//     IDCODE:     begin LEDs <= IR_REG_OUT;                                           end
+//     SAMPLE:     begin LEDs <= { EXTEST_IO, INTEST_CL  };                            end
+//     EXTEST:     begin LEDs <= { EXTEST_IO, TUMBLERS   };                            end
+//     INTEST:     begin LEDs <= { CORE_LOGIC, INTEST_CL };                            end
+//     USERCODE:   begin LEDs <= UR_OUT;                                               end
+//     RUNBIST:    begin LEDs <= TUMBLERS[0] ? BIST_STATUS [15:8] : BIST_STATUS [7:0]; end
+//     default:    begin LEDs <= { EXTEST_IO, INTEST_CL  };                            end
+//     endcase
+// end
 
-//assign LEDs = TUMBLERS[0] ? BIST_STATUS [15:8] : BIST_STATUS [7:0];
+assign LEDs = TUMBLERS == 4'b0000 	? BIST_STATUS [15:8] :  (TUMBLERS == 4'b0001 ?
+						BIST_STATUS [7:0]			     :	(TUMBLERS == 4'b0010 ?
+						{LATCH_JTAG_IR, CORE_LOGIC}		 :	(TUMBLERS == 4'b0011 ?
+						{DR_CORE_LOGIC, BIST_CORE_LOGIC} :	(TUMBLERS == 4'b0100 ?
+						{EXTEST_IO, INTEST_CL}	         :	(TUMBLERS == 4'b0110 ?
+						BIST_OUT			             :	(TUMBLERS == 4'b0111 ?
+						bist_config_wire		         :	(TUMBLERS == 4'b1000 ?
+						bist_check_wire		             :	/*(TUMBLERS == 4'b1100 ?
+						test7[11:0]										:	(TUMBLERS == 4'b1110 ?
+						test8[11:0]										:	(TUMBLERS == 4'b1111 ?
+						test9[11:0]										:	(TUMBLERS == 4'b1101 ?
+						test10[11:0]									:	(TUMBLERS == 4'b1011 ?
+						test11[11:0]									:	(TUMBLERS == 4'b0101 ?
+						test14[11:0]									:	*/(8'h0))))))))/*))))))*/;
+///1///
 endmodule
