@@ -32,7 +32,7 @@ The DEPTH need not be a power of 2.
 )
 (
     input            TMS       // J20: V14
-,   input            clk       // J20: V15	
+,   input            clk       // E12	
 ,   input            TCK       // J20: V15
 ,   input            TDI       // J20: W16
 ,   output reg       TDO       // J20: V16
@@ -213,7 +213,7 @@ core_logic core_logic_inst
 ///////////////////////////////////////////////////////////////////////////////////////
 // MUX Core_Logic INPUT & OUTPUT
 ///////////////////////////////////////////////////////////////////////////////////////
-assign CL_INPUT  = RUNBIST_SELECT | !INTEST_SELECT | GETTEST_SELECT ? BIST_OUT : {INTEST_CL, 1'b0};
+assign CL_INPUT  = RUNBIST_SELECT /*| !INTEST_SELECT | GETTEST_SELECT*/ ? BIST_OUT : {INTEST_CL, 1'b0};
 
 assign BIST_CORE_LOGIC = RUNBIST_SELECT  ? CORE_LOGIC : 4'b0000;
 assign DR_CORE_LOGIC   = !RUNBIST_SELECT ? CORE_LOGIC : 4'b0000;
@@ -274,7 +274,7 @@ always @(posedge TCK) begin
 				INTEST:     begin TDO <= BSR_TDO;          	  end
 				USERCODE:   begin TDO <= BSR_TDO;          	  end
 				RUNBIST:    begin TDO <= STATUS_BIST_REG_TDO; end
-            	default:    begin TDO <= ID_REG_TDO;       	  end
+            	default:    begin TDO <= ID_REG_TDO;       	  end /*TDO <= STATUS_BIST_REG_TDO*/
         endcase  
     end else
 	 if ( SHIFTIR ) begin
@@ -301,15 +301,15 @@ assign LEDs = TUMBLERS == 4'b0000 	? BIST_STATUS [15:8] :  (TUMBLERS == 4'b0001 
 						BIST_STATUS [7:0]			     :	(TUMBLERS == 4'b0010 ?
 						{LATCH_JTAG_IR, CORE_LOGIC}		 :	(TUMBLERS == 4'b0011 ?
 						{DR_CORE_LOGIC, BIST_CORE_LOGIC} :	(TUMBLERS == 4'b0100 ?
-						{EXTEST_IO, INTEST_CL}	         :	(TUMBLERS == 4'b0110 ?
-						BIST_OUT			             :	(TUMBLERS == 4'b0111 ?
-						bist_config_wire		         :	(TUMBLERS == 4'b1000 ?
-						bist_check_wire		             :	/*(TUMBLERS == 4'b1100 ?
+						bist_config_wire		         :	(TUMBLERS == 4'b0110 ?
+						bist_check_wire		             :	(TUMBLERS == 4'b0111 ?
+						BIST_OUT		         		 :	
+								             						  /*:	(TUMBLERS == 4'b1100 ?
 						test7[11:0]										:	(TUMBLERS == 4'b1110 ?
 						test8[11:0]										:	(TUMBLERS == 4'b1111 ?
 						test9[11:0]										:	(TUMBLERS == 4'b1101 ?
 						test10[11:0]									:	(TUMBLERS == 4'b1011 ?
 						test11[11:0]									:	(TUMBLERS == 4'b0101 ?
-						test14[11:0]									:	*/(8'h0))))))))/*))))))*/;
+						test14[11:0]									:	*/(8'h0)))))))/*))))))*/;
 ///1///
 endmodule
